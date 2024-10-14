@@ -1,20 +1,23 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
-import 'package:text_repeater/my_app.dart';
+import 'package:text_repeater/features/presentation/views/home.dart';
+import 'package:text_repeater/features/presentation/views/onboard.dart';
 import 'route_names.dart';
 
 class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // case RouteNames.signIn:
-      //   return _fadeRoute(
-      //     settings: settings,
-      //     view: const MyHomePage(
-      //       title: 'Sign In',
-      //     ),
-      //   );
-
+      case RouteNames.onboard:
+        return _fadeRoute(
+          settings: settings,
+          view: const Onboard(),
+        );
+      case RouteNames.home:
+        return _fadeRoute(
+          settings: settings,
+          view: const Home(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

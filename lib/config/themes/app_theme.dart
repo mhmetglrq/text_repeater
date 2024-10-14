@@ -79,7 +79,6 @@ class AppTheme {
           fontSize: context.dynamicHeight(0.017),
         ),
       ),
-      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.kBlack),
     );
   }
 
