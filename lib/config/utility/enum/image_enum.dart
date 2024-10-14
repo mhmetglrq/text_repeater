@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 enum ImageEnum {
-  menu('menu'),
-  notifications('notifications'),
-  notificationFilled('notification_filled'),
-  logo('logo'),
-  date('date'),
-  time('time'),
+  menu('logo'),
+  messageBox('message_box'),
   ;
 
   final String value;
