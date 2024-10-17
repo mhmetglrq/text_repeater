@@ -1,25 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/usecases/get_onboard_status_usecase.dart';
-import '../../../domain/usecases/save_onboard_status_usecase.dart';
+import '../../../../domain/usecases/onboard/local/get_onboard_status_usecase.dart';
+import '../../../../domain/usecases/onboard/local/save_onboard_status_usecase.dart';
 
 import 'package:equatable/equatable.dart';
 
-part 'onboard_state.dart';
-part 'onboard_event.dart';
+part 'local_onboard_state.dart';
+part 'local_onboard_event.dart';
 
-class OnboardBloc extends Bloc<OnboardEvent, OnboardState> {
+class LocalOnboardBloc extends Bloc<LocalOnboardEvent, LocalOnboardState> {
   final GetOnboardStatusUsecase _getOnboardStatusUsecase;
   final SaveOnboardStatusUseCase _saveOnboardStatusUseCase;
 
-  OnboardBloc(this._getOnboardStatusUsecase, this._saveOnboardStatusUseCase)
+  LocalOnboardBloc(
+      this._getOnboardStatusUsecase, this._saveOnboardStatusUseCase)
       : super(const OnboardInitialState()) {
     on<GetOnboardStatusEvent>(onGetOnBoardStatus);
     on<SaveOnboardStatusEvent>(onSaveOnBoardStatus);
   }
 
   void onGetOnBoardStatus(
-      GetOnboardStatusEvent event, Emitter<OnboardState> emit) async {
+      GetOnboardStatusEvent event, Emitter<LocalOnboardState> emit) async {
     emit(const OnboardLoadingState());
     await _getOnboardStatusUsecase().then((status) {
       emit(OnboardSuccessState(status: status));
@@ -29,7 +30,7 @@ class OnboardBloc extends Bloc<OnboardEvent, OnboardState> {
   }
 
   void onSaveOnBoardStatus(
-      SaveOnboardStatusEvent event, Emitter<OnboardState> emit) async {
+      SaveOnboardStatusEvent event, Emitter<LocalOnboardState> emit) async {
     await _saveOnboardStatusUseCase(
       params: event.status,
     ).then((_) {

@@ -1,30 +1,30 @@
-part of 'onboard_bloc.dart';
+part of 'local_onboard_bloc.dart';
 
-sealed class OnboardState extends Equatable {
+sealed class LocalOnboardState extends Equatable {
   final bool? status;
 
-  const OnboardState({this.status});
+  const LocalOnboardState({this.status});
 
   @override
   List<Object?> get props => [status];
 }
 
-class OnboardInitialState extends OnboardState {
+class OnboardInitialState extends LocalOnboardState {
   const OnboardInitialState();
 }
 
-class OnboardLoadingState extends OnboardState {
+class OnboardLoadingState extends LocalOnboardState {
   const OnboardLoadingState();
 }
 
-class OnboardSuccessState extends OnboardState {
+class OnboardSuccessState extends LocalOnboardState {
   const OnboardSuccessState({super.status});
 
   @override
   List<Object?> get props => [status];
 }
 
-class OnboardErrorState extends OnboardState {
+class OnboardErrorState extends LocalOnboardState {
   final String message;
 
   const OnboardErrorState(this.message);
