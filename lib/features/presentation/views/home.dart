@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:text_repeater/config/constants/menu_constants.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
 
 import '../../../config/items/borders/container_borders.dart';
@@ -23,7 +26,39 @@ class _HomeState extends State<Home> {
           padding: context.paddingAllDefault,
           child: Column(
             children: [
-              const CustomAppBar(),
+              CustomAppBar(
+                title: "Home",
+                leading: Container(
+                  decoration: BoxDecoration(
+                    border: ContainerBorders.containerMediumBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: context.paddingAllLow,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: SvgPicture.asset(
+                        ImageEnum.menu.toSvg,
+                      ),
+                    ),
+                  ),
+                ),
+                trailing: Container(
+                  decoration: BoxDecoration(
+                    border: ContainerBorders.containerMediumBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: context.paddingAllLow,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: SvgPicture.asset(
+                        ImageEnum.notification.toSvg,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Padding(
                 padding: context.paddingVerticalLow,
                 child: Align(
@@ -56,44 +91,53 @@ class _HomeState extends State<Home> {
                         _currentIndex = index;
                       });
                     },
+                    itemCount: MenuConstants.menuItems.length,
                     padEnds: false,
                     controller: PageController(viewportFraction: 0.7),
                     itemBuilder: (context, index) {
+                      final menuItem = MenuConstants.menuItems[index];
                       return Padding(
                         padding: context.paddingRightLow,
-                        child: AnimatedContainer(
-                          decoration: BoxDecoration(
-                            color: _currentIndex == index
-                                ? AppColors.kPrimaryLight
-                                : AppColors.kNeutral10,
-                            borderRadius: BorderRadius.circular(10),
-                            border: _currentIndex == index
-                                ? null
-                                : ContainerBorders.containerSmallBorder,
-                          ),
-                          padding: context.paddingAllDefault,
-                          duration: const Duration(milliseconds: 500),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Application Design',
-                                style:
-                                    context.textTheme.headlineMedium?.copyWith(
-                                  color: _currentIndex == index
-                                      ? Colors.white
-                                      : AppColors.kBlue100,
-                                  fontWeight: FontWeight.w600,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, menuItem.route);
+                          },
+                          child: AnimatedContainer(
+                            decoration: BoxDecoration(
+                              color: _currentIndex == index
+                                  ? AppColors.kPrimaryLight
+                                  : AppColors.kNeutral10,
+                              borderRadius: BorderRadius.circular(10),
+                              border: _currentIndex == index
+                                  ? null
+                                  : ContainerBorders.containerSmallBorder,
+                            ),
+                            padding: context.paddingAllDefault,
+                            duration: const Duration(milliseconds: 500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  menuItem.title,
+                                  style: context.textTheme.headlineMedium
+                                      ?.copyWith(
+                                    color: _currentIndex == index
+                                        ? Colors.white
+                                        : AppColors.kBlue100,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: context.dynamicHeight(0.023),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Application Design',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.kNeutral30,
+                                Text(
+                                  menuItem.description,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.kNeutral30,
+                                    fontSize: context.dynamicHeight(0.018),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -179,49 +223,48 @@ class _HomeState extends State<Home> {
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({
     super.key,
+    this.leading,
+    this.title = "",
+    this.trailing,
   });
+
+  final String title;
+  final Widget? leading;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            border: ContainerBorders.containerMediumBorder,
-            shape: BoxShape.circle,
-          ),
-          child: Padding(
-            padding: context.paddingAllLow,
-            child: GestureDetector(
-              onTap: () {},
-              child: SvgPicture.asset(
-                ImageEnum.menu.toSvg,
-              ),
-            ),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            leading ??
+                Container(
+                  decoration: BoxDecoration(
+                    border: ContainerBorders.containerMediumBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: context.paddingAllLow,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                      ),
+                    ),
+                  ),
+                ),
+            trailing ?? const SizedBox()
+          ],
         ),
-        Expanded(
-            child: Text(
-          'Home',
+        Text(
+          title,
           style: context.textTheme.headlineLarge?.copyWith(
             color: AppColors.kBlue100,
           ),
           textAlign: TextAlign.center,
-        )),
-        Container(
-          decoration: BoxDecoration(
-            border: ContainerBorders.containerMediumBorder,
-            shape: BoxShape.circle,
-          ),
-          child: Padding(
-            padding: context.paddingAllLow,
-            child: GestureDetector(
-              onTap: () {},
-              child: SvgPicture.asset(
-                ImageEnum.notification.toSvg,
-              ),
-            ),
-          ),
         ),
       ],
     );

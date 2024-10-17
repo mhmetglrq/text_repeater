@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:text_repeater/features/presentation/views/home.dart';
 import 'package:text_repeater/features/presentation/views/onboard.dart';
+import 'package:text_repeater/features/presentation/views/text_repeater.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -18,6 +19,32 @@ class AppRouter {
           settings: settings,
           view: const Home(),
         );
+      case RouteNames.textRepeater:
+        return _fadeRoute(
+          settings: settings,
+          view: const TextRepeater(),
+        );
+      case RouteNames.textRandomizer:
+        return _fadeRoute(
+          settings: settings,
+          view: const Home(),
+        );
+      case RouteNames.wordCloud:
+        return _fadeRoute(
+          settings: settings,
+          view: const Home(),
+        );
+      case RouteNames.textSorting:
+        return _fadeRoute(
+          settings: settings,
+          view: const Home(),
+        );
+      case RouteNames.reverseText:
+        return _fadeRoute(
+          settings: settings,
+          view: const Home(),
+        );
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:text_repeater/features/data/data_sources/local/hive_database_service.dart';
 
-import '../../domain/repositories/local_onboard_repository.dart';
+import '../../../../domain/repositories/onboard/local/local_onboard_repository.dart';
 
 class LocalOnboardRepositoryImpl implements LocalOnboardRepository {
   final HiveDatabaseService _databaseService;

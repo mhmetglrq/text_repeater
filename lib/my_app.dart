@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:text_repeater/config/router/route_names.dart';
 import 'package:text_repeater/config/themes/app_theme.dart';
-import 'package:text_repeater/features/presentation/bloc/onboard/onboard_bloc.dart';
+import 'package:text_repeater/features/presentation/bloc/onboard/local/local_onboard_bloc.dart';
 
 import 'config/router/app_router.dart';
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OnboardBloc, OnboardState>(
+    return BlocBuilder<LocalOnboardBloc, LocalOnboardState>(
       builder: (context, state) {
         if (state is OnboardSuccessState) {
           return MaterialApp(
@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
             initialRoute:
                 (state.status ?? false) ? RouteNames.home : RouteNames.onboard,
           );
-        } else if (state is OnboardLoadingState || state is OnboardInitialState) {
+        } else if (state is OnboardLoadingState ||
+            state is OnboardInitialState) {
           return const Material(
             child: Center(
               child: CircularProgressIndicator.adaptive(),
