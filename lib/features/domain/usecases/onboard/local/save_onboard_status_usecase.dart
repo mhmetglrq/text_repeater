@@ -1,5 +1,5 @@
-import '../../../core/usecase/usecase.dart';
-import '../repositories/local_onboard_repository.dart';
+import '../../../../../core/usecase/usecase.dart';
+import '../../../repositories/onboard/local/local_onboard_repository.dart';
 
 class SaveOnboardStatusUseCase implements UseCase<void, bool> {
   final LocalOnboardRepository _onboardRepository;
