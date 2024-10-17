@@ -8,14 +8,8 @@ class AppTheme {
   static ThemeData lightTheme(BuildContext context) {
     return ThemeData(
       brightness: Brightness.light,
-      primaryColor: AppColors.kBlack,
+      primaryColor: AppColors.kPrimaryLight,
       scaffoldBackgroundColor: Colors.white,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        titleTextStyle: TextStyle(color: Colors.black),
-      ),
       fontFamily: "Poppins",
       textTheme: TextTheme(
         displayLarge: TextStyle(
@@ -36,11 +30,11 @@ class AppTheme {
         ),
         headlineSmall: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: context.dynamicHeight(0.027),
+          fontSize: context.dynamicHeight(0.022),
         ),
         headlineMedium: TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: context.dynamicHeight(0.022),
+          fontSize: context.dynamicHeight(0.027),
         ),
         titleLarge: TextStyle(
           fontWeight: FontWeight.w600,
