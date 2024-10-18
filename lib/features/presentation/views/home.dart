@@ -1,10 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:text_repeater/config/constants/menu_constants.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/utility/enum/image_enum.dart';
+import '../../../config/widgets/custom_appbar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -23,7 +27,39 @@ class _HomeState extends State<Home> {
           padding: context.paddingAllDefault,
           child: Column(
             children: [
-              const CustomAppBar(),
+              CustomAppBar(
+                title: "Home",
+                leading: Container(
+                  decoration: BoxDecoration(
+                    border: ContainerBorders.containerMediumBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: context.paddingAllLow,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: SvgPicture.asset(
+                        ImageEnum.menu.toSvg,
+                      ),
+                    ),
+                  ),
+                ),
+                trailing: Container(
+                  decoration: BoxDecoration(
+                    border: ContainerBorders.containerMediumBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: context.paddingAllLow,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: SvgPicture.asset(
+                        ImageEnum.notification.toSvg,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Padding(
                 padding: context.paddingVerticalLow,
                 child: Align(
@@ -56,44 +92,53 @@ class _HomeState extends State<Home> {
                         _currentIndex = index;
                       });
                     },
+                    itemCount: MenuConstants.menuItems.length,
                     padEnds: false,
                     controller: PageController(viewportFraction: 0.7),
                     itemBuilder: (context, index) {
+                      final menuItem = MenuConstants.menuItems[index];
                       return Padding(
                         padding: context.paddingRightLow,
-                        child: AnimatedContainer(
-                          decoration: BoxDecoration(
-                            color: _currentIndex == index
-                                ? AppColors.kPrimaryLight
-                                : AppColors.kNeutral10,
-                            borderRadius: BorderRadius.circular(10),
-                            border: _currentIndex == index
-                                ? null
-                                : ContainerBorders.containerSmallBorder,
-                          ),
-                          padding: context.paddingAllDefault,
-                          duration: const Duration(milliseconds: 500),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Application Design',
-                                style:
-                                    context.textTheme.headlineMedium?.copyWith(
-                                  color: _currentIndex == index
-                                      ? Colors.white
-                                      : AppColors.kBlue100,
-                                  fontWeight: FontWeight.w600,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, menuItem.route);
+                          },
+                          child: AnimatedContainer(
+                            decoration: BoxDecoration(
+                              color: _currentIndex == index
+                                  ? AppColors.kPrimaryLight
+                                  : AppColors.kNeutral10,
+                              borderRadius: BorderRadius.circular(10),
+                              border: _currentIndex == index
+                                  ? null
+                                  : ContainerBorders.containerSmallBorder,
+                            ),
+                            padding: context.paddingAllDefault,
+                            duration: const Duration(milliseconds: 500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  menuItem.title,
+                                  style: context.textTheme.headlineMedium
+                                      ?.copyWith(
+                                    color: _currentIndex == index
+                                        ? Colors.white
+                                        : AppColors.kBlue100,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: context.dynamicHeight(0.023),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Application Design',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.kNeutral30,
+                                Text(
+                                  menuItem.description,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.kNeutral30,
+                                    fontSize: context.dynamicHeight(0.018),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -172,58 +217,6 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            border: ContainerBorders.containerMediumBorder,
-            shape: BoxShape.circle,
-          ),
-          child: Padding(
-            padding: context.paddingAllLow,
-            child: GestureDetector(
-              onTap: () {},
-              child: SvgPicture.asset(
-                ImageEnum.menu.toSvg,
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-            child: Text(
-          'Home',
-          style: context.textTheme.headlineLarge?.copyWith(
-            color: AppColors.kBlue100,
-          ),
-          textAlign: TextAlign.center,
-        )),
-        Container(
-          decoration: BoxDecoration(
-            border: ContainerBorders.containerMediumBorder,
-            shape: BoxShape.circle,
-          ),
-          child: Padding(
-            padding: context.paddingAllLow,
-            child: GestureDetector(
-              onTap: () {},
-              child: SvgPicture.asset(
-                ImageEnum.notification.toSvg,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

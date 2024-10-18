@@ -1,5 +1,5 @@
-import '../../../core/usecase/usecase.dart';
-import '../repositories/local_onboard_repository.dart';
+import '../../../../../core/usecase/usecase.dart';
+import '../../../repositories/onboard/local/local_onboard_repository.dart';
 
 class GetOnboardStatusUsecase implements UseCase<bool, void> {
   final LocalOnboardRepository _onboardRepository;

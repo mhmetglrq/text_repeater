@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/router/route_names.dart';
 import 'package:text_repeater/config/utility/enum/image_enum.dart';
-import 'package:text_repeater/features/presentation/bloc/onboard/onboard_bloc.dart';
+import 'package:text_repeater/features/presentation/bloc/onboard/local/local_onboard_bloc.dart';
 
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/widgets/bordered_button.dart';
@@ -138,7 +138,7 @@ class Onboard extends StatelessWidget {
                             color: AppColors.kWhite,
                           ),
                           onPressed: () {
-                            context.read<OnboardBloc>().add(
+                            context.read<LocalOnboardBloc>().add(
                                   const SaveOnboardStatusEvent(true),
                                 );
                             Navigator.pushNamed(context, RouteNames.home);
