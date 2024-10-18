@@ -8,6 +8,7 @@ import 'package:text_repeater/config/extensions/context_extensions.dart';
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/utility/enum/image_enum.dart';
+import '../../../config/widgets/custom_appbar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -216,57 +217,6 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({
-    super.key,
-    this.leading,
-    this.title = "",
-    this.trailing,
-  });
-
-  final String title;
-  final Widget? leading;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            leading ??
-                Container(
-                  decoration: BoxDecoration(
-                    border: ContainerBorders.containerMediumBorder,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: context.paddingAllLow,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                      ),
-                    ),
-                  ),
-                ),
-            trailing ?? const SizedBox()
-          ],
-        ),
-        Text(
-          title,
-          style: context.textTheme.headlineLarge?.copyWith(
-            color: AppColors.kBlue100,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

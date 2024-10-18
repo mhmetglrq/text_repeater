@@ -6,7 +6,6 @@ import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/utility/utils/utils.dart';
 import 'package:text_repeater/config/widgets/bordered_button.dart';
 import 'package:text_repeater/config/widgets/input_field.dart';
-import 'package:text_repeater/features/presentation/views/home.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../config/items/borders/container_borders.dart';
@@ -14,14 +13,14 @@ import '../../../config/items/colors/app_colors.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
-class TextRepeater extends StatefulWidget {
-  const TextRepeater({super.key});
+class TextRandomizer extends StatefulWidget {
+  const TextRandomizer({super.key});
 
   @override
-  State<TextRepeater> createState() => _TextRepeaterState();
+  State<TextRandomizer> createState() => _TextRandomizerState();
 }
 
-class _TextRepeaterState extends State<TextRepeater> {
+class _TextRandomizerState extends State<TextRandomizer> {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _repeatController = TextEditingController();
   final TextEditingController _outputController =
@@ -55,7 +54,7 @@ class _TextRepeaterState extends State<TextRepeater> {
             child: Column(
               children: [
                 const CustomAppBar(
-                  title: 'Text Repeater',
+                  title: 'Text Randomizer',
                 ),
                 Padding(
                   padding: context.paddingTopDefault,
