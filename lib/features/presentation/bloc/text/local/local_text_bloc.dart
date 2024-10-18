@@ -10,6 +10,7 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
   LocalTextBloc(this._repeatTextUsecase)
       : super(const LocalTextInitialState()) {
     on<RepeatTextEvent>(onRepeatText);
+    on<RemoveTextEvent>(onRemoveText);
   }
 
   void onRepeatText(RepeatTextEvent event, Emitter<LocalTextState> emit) async {
@@ -22,5 +23,9 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
+  }
+
+  void onRemoveText(RemoveTextEvent event, Emitter<LocalTextState> emit) {
+    emit(const LocalTextInitialState());
   }
 }
