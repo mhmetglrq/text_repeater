@@ -59,13 +59,11 @@ class _TextRandomizerState extends State<TextRandomizer> {
                 Expanded(
                   child: Padding(
                     padding: context.paddingTopDefault,
-                    child: Card(
-                      color: AppColors.kWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(
-                          color: AppColors.kBlue20,
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.kWhite,
+                        border: ContainerBorders.containerMediumBorder,
+                        borderRadius: ContainerBorders.borderRadius,
                       ),
                       child: Padding(
                         padding: context.paddingAllDefault,
@@ -73,8 +71,8 @@ class _TextRandomizerState extends State<TextRandomizer> {
                           children: [
                             Expanded(
                               child: InputField(
-                                expands: true,
                                 labelText: "Text",
+                                maxLines: 3,
                                 controller: _textController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -85,18 +83,14 @@ class _TextRandomizerState extends State<TextRandomizer> {
                               ),
                             ),
                             BorderedButton(
-                              text: "Repeat",
+                              text: "Randomize",
                               onPressed: () {
                                 if (!_formKey.currentState!.validate()) {
                                   return;
                                 } else {
                                   BlocProvider.of<LocalTextBloc>(context).add(
-                                    RepeatTextEvent(
+                                    RandomizeTextEvent(
                                       text: _textController.text,
-                                      newLine: _isNewLine,
-                                      times: int.tryParse(
-                                              _repeatController.text) ??
-                                          0,
                                     ),
                                   );
                                 }
@@ -112,6 +106,9 @@ class _TextRandomizerState extends State<TextRandomizer> {
                       ),
                     ),
                   ),
+                ),
+                SizedBox(
+                  height: context.dynamicHeight(0.02),
                 ),
                 BlocBuilder<LocalTextBloc, LocalTextState>(
                   builder: (context, state) {
@@ -201,16 +198,7 @@ class _TextRandomizerState extends State<TextRandomizer> {
                         child: Text(state.message ?? ""),
                       );
                     } else {
-                      return Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.kWhite,
-                            border: ContainerBorders.containerMediumBorder,
-                            borderRadius: ContainerBorders.borderRadius,
-                          ),
-                          padding: context.paddingAllDefault,
-                        ),
-                      );
+                      return const SizedBox();
                     }
                   },
                 ),
