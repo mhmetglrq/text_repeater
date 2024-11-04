@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/sort_text_usecase.dart';
+import 'package:text_repeater/features/presentation/bloc/text/local/local_text_bloc.dart';
 
 import '../../../../domain/usecases/onboard/local/get_onboard_status_usecase.dart';
 import '../../../../domain/usecases/onboard/local/save_onboard_status_usecase.dart';
@@ -13,8 +15,9 @@ class LocalOnboardBloc extends Bloc<LocalOnboardEvent, LocalOnboardState> {
   final SaveOnboardStatusUseCase _saveOnboardStatusUseCase;
 
   LocalOnboardBloc(
-      this._getOnboardStatusUsecase, this._saveOnboardStatusUseCase)
-      : super(const OnboardInitialState()) {
+    this._getOnboardStatusUsecase,
+    this._saveOnboardStatusUseCase,
+  ) : super(const OnboardInitialState()) {
     on<GetOnboardStatusEvent>(onGetOnBoardStatus);
     on<SaveOnboardStatusEvent>(onSaveOnBoardStatus);
   }

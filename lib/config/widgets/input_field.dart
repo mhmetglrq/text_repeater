@@ -32,6 +32,7 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textAlign: TextAlign.justify,
       textAlignVertical: TextAlignVertical.top,
       expands: expands,
       maxLines: maxLines,
