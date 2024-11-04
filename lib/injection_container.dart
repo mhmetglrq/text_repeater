@@ -4,6 +4,7 @@ import 'package:text_repeater/features/data/repositories/onboard/local/local_onb
 import 'package:text_repeater/features/domain/repositories/text/local/local_text_repository.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/randomize_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/repeat_text_usecase.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/sort_text_usecase.dart';
 import 'package:text_repeater/features/presentation/bloc/text/local/local_text_bloc.dart';
 
 import 'config/models/text_model.dart';
@@ -33,8 +34,9 @@ Future<void> initializeDependencies() async {
       SaveOnboardStatusUseCase(sl()));
   sl.registerSingleton<RepeatTextUsecase>(RepeatTextUsecase(sl()));
   sl.registerSingleton<RandomizeTextUsecase>(RandomizeTextUsecase(sl()));
+  sl.registerSingleton<SortTextUsecase>(SortTextUsecase(sl()));
 
   //Blocs
   sl.registerFactory<LocalOnboardBloc>(() => LocalOnboardBloc(sl(), sl()));
-  sl.registerFactory<LocalTextBloc>(() => LocalTextBloc(sl(), sl()));
+  sl.registerFactory<LocalTextBloc>(() => LocalTextBloc(sl(), sl(), sl()));
 }
