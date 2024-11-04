@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:text_repeater/features/data/repositories/onboard/local/local_onboard_repository_impl.dart';
 import 'package:text_repeater/features/domain/repositories/text/local/local_text_repository.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/create_word_cloud_usecase.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/get_saved_texts_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/randomize_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/repeat_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/reverse_text_usecase.dart';
@@ -37,9 +39,11 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<RandomizeTextUsecase>(RandomizeTextUsecase(sl()));
   sl.registerSingleton<SortTextUsecase>(SortTextUsecase(sl()));
   sl.registerSingleton<ReverseTextUsecase>(ReverseTextUsecase(sl()));
+  sl.registerSingleton<CreateWordCloudUseCase>(CreateWordCloudUseCase(sl()));
+  sl.registerSingleton<GetSavedTextsUsecase>(GetSavedTextsUsecase(sl()));
 
   //Blocs
   sl.registerFactory<LocalOnboardBloc>(() => LocalOnboardBloc(sl(), sl()));
   sl.registerFactory<LocalTextBloc>(
-      () => LocalTextBloc(sl(), sl(), sl(), sl()));
+      () => LocalTextBloc(sl(), sl(), sl(), sl(), sl(),sl()));
 }

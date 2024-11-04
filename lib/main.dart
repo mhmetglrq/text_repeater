@@ -6,6 +6,8 @@ import 'package:text_repeater/injection_container.dart';
 import 'features/presentation/bloc/text/local/local_text_bloc.dart';
 import 'my_app.dart';
 
+//TODO : Add buttons to save textModel to local storage
+
 Future<void> main() async {
   await initializeDependencies();
 
