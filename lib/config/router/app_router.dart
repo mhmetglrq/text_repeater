@@ -6,7 +6,9 @@ import 'package:text_repeater/features/presentation/views/onboard.dart';
 import 'package:text_repeater/features/presentation/views/text_repeater.dart';
 import 'package:text_repeater/features/presentation/views/text_reverser.dart';
 import 'package:text_repeater/features/presentation/views/text_sorter.dart';
+import 'package:text_repeater/features/presentation/views/word_cloud.dart';
 import '../../features/presentation/views/text_randomizer.dart';
+import '../models/text_model.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -23,29 +25,49 @@ class AppRouter {
           view: const Home(),
         );
       case RouteNames.textRepeater:
+        final args = settings.arguments as TextModel?;
+
         return _fadeRoute(
           settings: settings,
-          view: const TextRepeater(),
+          view: TextRepeater(
+            textModel: args,
+          ),
         );
       case RouteNames.textRandomizer:
+        final args = settings.arguments as TextModel?;
+
         return _fadeRoute(
           settings: settings,
-          view: const TextRandomizer(),
+          view: TextRandomizer(
+            textModel: args,
+          ),
         );
       case RouteNames.wordCloud:
+        final args = settings.arguments as TextModel?;
+
         return _fadeRoute(
           settings: settings,
-          view: const Home(),
+          view: WordCloud(
+            textModel: args,
+          ),
         );
       case RouteNames.textSorting:
+        final args = settings.arguments as TextModel?;
+
         return _fadeRoute(
           settings: settings,
-          view: const TextSorting(),
+          view: TextSorting(
+            textModel: args,
+          ),
         );
       case RouteNames.reverseText:
+        final args = settings.arguments as TextModel?;
+
         return _fadeRoute(
           settings: settings,
-          view: const TextReverser(),
+          view: TextReverser(
+            textModel: args,
+          ),
         );
 
       default:

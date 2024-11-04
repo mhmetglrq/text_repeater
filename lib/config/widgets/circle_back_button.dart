@@ -17,6 +17,7 @@ class CircleBackButton extends StatelessWidget {
       customBorder: const CircleBorder(),
       onTap: () {
         context.read<LocalTextBloc>().add(const RemoveTextEvent());
+        context.read<LocalTextBloc>().add(const GetSavedTextsEvent());
         Navigator.pop(context);
       },
       child: Container(
