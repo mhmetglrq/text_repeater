@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:text_repeater/config/models/text_model.dart';
 import 'package:text_repeater/features/data/data_sources/local/hive_database_service.dart';
 
@@ -10,14 +12,26 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
 
   @override
   Future<List<TextModel>> getSavedTexts() async {
-    // return await _databaseService.getAllTexts();
-    throw UnimplementedError();
+    List<TextModel> savedTexts = [];
+    final data = await _databaseService.getData("recents", "text");
+    if (data != null) {
+      for (var textModel in data) {
+        savedTexts.add(textModel);
+      }
+    }
+    return savedTexts;
   }
 
   @override
   Future<String> randomizeText({required String text}) async {
     List<String> words = text.split(' ');
     words.shuffle(); // Kelimeleri karıştır
+    TextModel textModel = TextModel(
+        text: words.join(' '),
+        createdAt: DateTime.now(),
+        type: 'randomize',
+        repeatCount: 0);
+    await saveText(textModel: textModel);
     return words.join(' '); // Yeniden birleştir ve döndür
   }
 
@@ -25,50 +39,81 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
   Future<String> repeatText(
       {required String text, required int times, required bool newLine}) async {
     String separator = newLine ? '\n' : ' ';
+
+    TextModel textModel = TextModel(
+        text: text,
+        createdAt: DateTime.now(),
+        type: 'repeat',
+        repeatCount: times,
+        isNewLine: newLine);
+
+    await saveText(textModel: textModel);
     return List.filled(times, text)
         .join(separator); // Metni belirtilen sayıda tekrarla
   }
 
   @override
   Future<String> reverseText({required String text}) async {
+    TextModel textModel = TextModel(
+        text: text.split('').reversed.join(),
+        createdAt: DateTime.now(),
+        type: 'reverse',
+        repeatCount: 0);
+    await saveText(textModel: textModel);
     return text.split('').reversed.join(); // Metni ters çevir
   }
 
   @override
-  Future<void> saveText(
-      {required String text,
-      required DateTime createdAt,
-      required String type,
-      required int repeatCount}) async {
-    // final textModel = TextModel(
-    //   text: text,
-    //   createdAt: createdAt,
-    //   type: type,
-    //   repeatCount: repeatCount,
-    // );
-    // await _databaseService.saveText(textModel); // Hive'a kaydet
+  Future<void> saveText({required TextModel textModel}) async {
+    List<TextModel> savedTexts = await getSavedTexts();
+    if (savedTexts.length >= 10) {
+      savedTexts.removeAt(0);
+    }
+
+    savedTexts.add(textModel);
+    await _databaseService.putData("recents", "text", savedTexts);
   }
 
   @override
   Future<String> sortText({required String text}) async {
     List<String> words = text.split(' ');
     words.sort(); // Alfabetik sıraya göre sırala
+
+    TextModel textModel = TextModel(
+        text: words.join(' '),
+        createdAt: DateTime.now(),
+        type: 'sort',
+        repeatCount: 0);
+    await saveText(textModel: textModel);
     return words.join(' '); // Yeniden birleştir ve döndür
   }
 
   @override
-  Future<String> wordCloud({required String text}) async {
-    // Kelime sıklığını hesaplayalım
-    Map<String, int> wordCount = {};
+  Future<List<Map<String, dynamic>>> wordCloud({required String text}) async {
+    // Kelime sıklığını hesaplayan metot
+    Map<String, dynamic> wordMap = {};
     List<String> words = text.split(' ');
 
     for (String word in words) {
-      wordCount[word] = (wordCount[word] ?? 0) + 1;
+      word =
+          word.toLowerCase(); // Büyük küçük harf duyarlılığını kaldırmak için
+      wordMap[word] =
+          Random().nextInt(100) + 10; // Kelime sıklığını rastgele ata
     }
 
-    // Kelime bulutunu basit bir string formunda döndürelim (Grafiksel olarak yapmak için başka paketler kullanılabilir)
-    return wordCount.entries
-        .map((entry) => '${entry.key}: ${entry.value}')
-        .join('\n');
+    // Map<String, int> türündeki wordCount'u List<Map> formatına dönüştürelim
+
+    List<Map<String, dynamic>> wordList = wordMap.entries.map((entry) {
+      return {'word': entry.key, 'value': entry.value};
+    }).toList();
+
+    TextModel textModel = TextModel(
+        text: text,
+        createdAt: DateTime.now(),
+        type: 'wordCloud',
+        repeatCount: 0);
+
+    await saveText(textModel: textModel);
+    return wordList;
   }
 }
