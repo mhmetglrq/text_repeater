@@ -10,11 +10,13 @@ import 'package:toastification/toastification.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
+import '../../../config/models/text_model.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
 class TextSorting extends StatefulWidget {
-  const TextSorting({super.key});
+  const TextSorting({super.key, this.textModel});
+  final TextModel? textModel;
 
   @override
   State<TextSorting> createState() => _TextSortingState();
@@ -26,6 +28,19 @@ class _TextSortingState extends State<TextSorting> {
   final TextEditingController _outputController =
       TextEditingController(); // Output için TextEditingController
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.textModel != null) {
+      _textController.text = widget.textModel!.text ?? "";
+      context.read<LocalTextBloc>().add(
+            SortTextEvent(
+              text: widget.textModel!.text ?? "",
+            ),
+          );
+    }
+  }
 
   @override
   void dispose() {

@@ -10,12 +10,13 @@ import 'package:toastification/toastification.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
+import '../../../config/models/text_model.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
 class TextRepeater extends StatefulWidget {
-  const TextRepeater({super.key});
-
+  const TextRepeater({super.key, this.textModel});
+  final TextModel? textModel;
   @override
   State<TextRepeater> createState() => _TextRepeaterState();
 }
@@ -27,6 +28,23 @@ class _TextRepeaterState extends State<TextRepeater> {
       TextEditingController(); // Output için TextEditingController
   bool _isNewLine = false;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.textModel != null) {
+      _textController.text = widget.textModel!.text ?? "";
+      _repeatController.text = widget.textModel!.repeatCount.toString();
+      _isNewLine = widget.textModel!.isNewLine ?? false;
+      context.read<LocalTextBloc>().add(
+            RepeatTextEvent(
+              text: _textController.text,
+              newLine: _isNewLine,
+              times: widget.textModel?.repeatCount ?? 0,
+            ),
+          );
+    }
+  }
 
   @override
   void dispose() {

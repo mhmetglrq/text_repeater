@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/router/route_names.dart';
-import 'package:text_repeater/config/utility/enum/image_enum.dart';
+import 'package:text_repeater/config/utility/enum/assets_enum.dart';
 import 'package:text_repeater/features/presentation/bloc/onboard/local/local_onboard_bloc.dart';
 
 import '../../../config/items/colors/app_colors.dart';
@@ -34,7 +34,7 @@ class Onboard extends StatelessWidget {
                             alignment: Alignment.center,
                             children: [
                               SvgPicture.asset(
-                                ImageEnum.messageBox.toSvg,
+                                AssetsEnum.messageBox.toSvg,
                                 height: context.dynamicHeight(0.05),
                               ),
                               Text(
@@ -52,7 +52,7 @@ class Onboard extends StatelessWidget {
                           alignment: Alignment.center,
                           children: [
                             SvgPicture.asset(
-                              ImageEnum.messageBox.toSvg,
+                              AssetsEnum.messageBox.toSvg,
                               height: context.dynamicHeight(0.055),
                             ),
                             Text(
@@ -72,7 +72,7 @@ class Onboard extends StatelessWidget {
                             alignment: Alignment.center,
                             children: [
                               SvgPicture.asset(
-                                ImageEnum.messageBox.toSvg,
+                                AssetsEnum.messageBox.toSvg,
                                 height: context.dynamicHeight(0.05),
                               ),
                               Text(

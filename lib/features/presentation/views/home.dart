@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:text_repeater/config/constants/menu_constants.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
+import 'package:text_repeater/config/models/text_model.dart';
+import 'package:text_repeater/config/utility/enum/text_features.dart';
+import 'package:text_repeater/config/utility/utils/utils.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
-import '../../../config/utility/enum/image_enum.dart';
+import '../../../config/utility/enum/assets_enum.dart';
 import '../../../config/widgets/custom_appbar.dart';
+import '../bloc/text/local/local_text_bloc.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +22,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<LocalTextBloc>().add(const GetSavedTextsEvent());
+  }
+
   int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -25,39 +37,6 @@ class _HomeState extends State<Home> {
           padding: context.paddingAllDefault,
           child: Column(
             children: [
-              CustomAppBar(
-                title: "Home",
-                leading: Container(
-                  decoration: BoxDecoration(
-                    border: ContainerBorders.containerMediumBorder,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: context.paddingAllLow,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: SvgPicture.asset(
-                        ImageEnum.menu.toSvg,
-                      ),
-                    ),
-                  ),
-                ),
-                trailing: Container(
-                  decoration: BoxDecoration(
-                    border: ContainerBorders.containerMediumBorder,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: context.paddingAllLow,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: SvgPicture.asset(
-                        ImageEnum.notification.toSvg,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               Padding(
                 padding: context.paddingVerticalLow,
                 child: Align(
@@ -73,7 +52,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       SvgPicture.asset(
-                        ImageEnum.ellipse.toSvg,
+                        AssetsEnum.ellipse.toSvg,
                         width: context.dynamicWidth(0.5),
                       ),
                     ],
@@ -166,50 +145,103 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: context.paddingBottomLow,
-                      child: Container(
-                        padding: context.paddingAllDefault,
-                        decoration: BoxDecoration(
-                          border: ContainerBorders.containerMediumBorder,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Text Repeater',
-                              style: context.textTheme.headlineMedium?.copyWith(
-                                color: AppColors.kNeutral40,
-                                fontWeight: FontWeight.w300,
+                child: BlocBuilder<LocalTextBloc, LocalTextState>(
+                  builder: (context, state) {
+                    if (state is LocalTextSavedTextsLoadingState) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (state is LocalTextSavedTextsSuccessState) {
+                      return (state.savedTexts ?? []).isNotEmpty
+                          ? RefreshIndicator(
+                              onRefresh: () async {
+                                context
+                                    .read<LocalTextBloc>()
+                                    .add(const GetSavedTextsEvent());
+                              },
+                              child: ListView.builder(
+                                itemCount: state.savedTexts?.length ?? 0,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final textModel = state.savedTexts![index];
+                                  return RecentItem(textModel: textModel);
+                                },
                               ),
-                            ),
-                            Text(
-                              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi.',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.kBlue100,
-                                fontWeight: FontWeight.w400,
+                            )
+                          : Center(
+                              child: Lottie.asset(
+                                AssetsEnum.empty.toJson,
+                                width: context.dynamicWidth(0.5),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              '2 min ago',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.kNeutral40,
-                                fontWeight: FontWeight.w300,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                            );
+                    } else {
+                      return Center(
+                        child: Text("${state.message}"),
+                      );
+                    }
                   },
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RecentItem extends StatelessWidget {
+  const RecentItem({
+    super.key,
+    required this.textModel,
+  });
+
+  final TextModel textModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          textModel.type?.getPath() ?? "",
+          arguments: textModel,
+        );
+      },
+      child: Padding(
+        padding: context.paddingBottomLow,
+        child: Container(
+          padding: context.paddingAllDefault,
+          decoration: BoxDecoration(
+            border: ContainerBorders.containerMediumBorder,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${textModel.type?.toEnum()}",
+                style: context.textTheme.headlineMedium?.copyWith(
+                  color: AppColors.kNeutral40,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              Text(
+                textModel.text ?? "",
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.kBlue100,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                Utils.getTimeDifference(textModel.createdAt ?? DateTime.now()),
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.kNeutral40,
+                  fontWeight: FontWeight.w300,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

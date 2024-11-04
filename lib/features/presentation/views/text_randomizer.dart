@@ -10,11 +10,13 @@ import 'package:toastification/toastification.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
+import '../../../config/models/text_model.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
 class TextRandomizer extends StatefulWidget {
-  const TextRandomizer({super.key});
+  const TextRandomizer({super.key, this.textModel});
+  final TextModel? textModel;
 
   @override
   State<TextRandomizer> createState() => _TextRandomizerState();
@@ -26,6 +28,19 @@ class _TextRandomizerState extends State<TextRandomizer> {
   final TextEditingController _outputController =
       TextEditingController(); // Output için TextEditingController
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.textModel != null) {
+      _textController.text = widget.textModel!.text ?? "";
+      context.read<LocalTextBloc>().add(
+            RandomizeTextEvent(
+              text: widget.textModel?.text ?? "",
+            ),
+          );
+    }
+  }
 
   @override
   void dispose() {
