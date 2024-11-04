@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:text_repeater/features/data/repositories/onboard/local/local_onboard_repository_impl.dart';
 import 'package:text_repeater/features/domain/repositories/text/local/local_text_repository.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/randomize_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/repeat_text_usecase.dart';
 import 'package:text_repeater/features/presentation/bloc/text/local/local_text_bloc.dart';
 
@@ -31,8 +32,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SaveOnboardStatusUseCase>(
       SaveOnboardStatusUseCase(sl()));
   sl.registerSingleton<RepeatTextUsecase>(RepeatTextUsecase(sl()));
+  sl.registerSingleton<RandomizeTextUsecase>(RandomizeTextUsecase(sl()));
 
   //Blocs
   sl.registerFactory<LocalOnboardBloc>(() => LocalOnboardBloc(sl(), sl()));
-  sl.registerFactory<LocalTextBloc>(() => LocalTextBloc(sl()));
+  sl.registerFactory<LocalTextBloc>(() => LocalTextBloc(sl(), sl()));
 }

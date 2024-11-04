@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/randomize_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/repeat_text_usecase.dart';
 
 part 'local_text_event.dart';
@@ -7,10 +8,12 @@ part 'local_text_state.dart';
 
 class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
   final RepeatTextUsecase _repeatTextUsecase;
-  LocalTextBloc(this._repeatTextUsecase)
+  final RandomizeTextUsecase _randomizeTextUsecase;
+  LocalTextBloc(this._repeatTextUsecase, this._randomizeTextUsecase)
       : super(const LocalTextInitialState()) {
     on<RepeatTextEvent>(onRepeatText);
     on<RemoveTextEvent>(onRemoveText);
+    on<RandomizeTextEvent>(onRandomizeText);
   }
 
   void onRepeatText(RepeatTextEvent event, Emitter<LocalTextState> emit) async {
@@ -27,5 +30,16 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
 
   void onRemoveText(RemoveTextEvent event, Emitter<LocalTextState> emit) {
     emit(const LocalTextInitialState());
+  }
+
+  void onRandomizeText(
+      RandomizeTextEvent event, Emitter<LocalTextState> emit) async {
+    emit(const LocalTextLoadingState());
+    await _randomizeTextUsecase(params: RandomizeTextParams(text: event.text))
+        .then((text) {
+      emit(LocalTextSuccessState(text: text));
+    }).catchError((error) {
+      emit(LocalTextErrorState(message: error.toString()));
+    });
   }
 }

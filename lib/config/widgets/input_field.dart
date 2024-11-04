@@ -3,7 +3,6 @@ import 'package:text_repeater/config/extensions/context_extensions.dart';
 
 import '../items/borders/input_borders.dart';
 
-
 class InputField extends StatelessWidget {
   const InputField({
     super.key,
@@ -14,6 +13,9 @@ class InputField extends StatelessWidget {
     this.obscureText = false,
     this.hintText,
     this.keyboardType,
+    this.expands = false,
+    this.maxLines,
+    this.minLines,
   }) : _controller = controller;
 
   final TextEditingController _controller;
@@ -23,14 +25,22 @@ class InputField extends StatelessWidget {
   final Widget? suffixIcon;
   final String? hintText;
   final TextInputType? keyboardType;
+  final bool expands;
+  final int? maxLines;
+  final int? minLines;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textAlignVertical: TextAlignVertical.top,
+      expands: expands,
+      maxLines: maxLines,
+      minLines: minLines,
       controller: _controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       decoration: InputDecoration(
+        alignLabelWithHint: true,
         suffixIcon: suffixIcon,
         labelText: labelText,
         hintText: hintText,

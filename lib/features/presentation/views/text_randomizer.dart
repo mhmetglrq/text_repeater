@@ -25,7 +25,7 @@ class _TextRandomizerState extends State<TextRandomizer> {
   final TextEditingController _repeatController = TextEditingController();
   final TextEditingController _outputController =
       TextEditingController(); // Output için TextEditingController
-  bool _isNewLine = false;
+  final bool _isNewLine = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -56,112 +56,68 @@ class _TextRandomizerState extends State<TextRandomizer> {
                 const CustomAppBar(
                   title: 'Text Randomizer',
                 ),
-                Padding(
-                  padding: context.paddingTopDefault,
-                  child: Card(
-                    color: AppColors.kWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(
-                        color: AppColors.kBlue20,
+                Expanded(
+                  child: Padding(
+                    padding: context.paddingTopDefault,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.kWhite,
+                        border: ContainerBorders.containerMediumBorder,
+                        borderRadius: ContainerBorders.borderRadius,
                       ),
-                    ),
-                    child: Padding(
-                      padding: context.paddingAllDefault,
-                      child: Column(
-                        children: [
-                          InputField(
-                            labelText: "Text",
-                            controller: _textController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please enter a text";
-                              }
-                              return null;
-                            },
-                          ),
-                          Padding(
-                            padding: context.paddingVerticalLow,
-                            child: InputField(
-                              labelText: "Repeat Count",
-                              controller: _repeatController,
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please enter a repeat count";
-                                } else if (value == "0") {
-                                  return "Please enter a number greater than 0";
-                                } else if (int.tryParse(value) == null) {
-                                  return "Please enter a valid number";
-                                } else if (value.length > 4) {
-                                  return "Please enter a number less than 10000";
+                      child: Padding(
+                        padding: context.paddingAllDefault,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: InputField(
+                                labelText: "Text",
+                                maxLines: 3,
+                                controller: _textController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Please enter a text";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            BorderedButton(
+                              text: "Randomize",
+                              onPressed: () {
+                                if (!_formKey.currentState!.validate()) {
+                                  return;
+                                } else {
+                                  BlocProvider.of<LocalTextBloc>(context).add(
+                                    RandomizeTextEvent(
+                                      text: _textController.text,
+                                    ),
+                                  );
                                 }
-
-                                return null;
                               },
+                              color: AppColors.kPrimaryLight,
+                              isBordered: false,
+                              textStyle: context.textTheme.bodyMedium?.copyWith(
+                                color: AppColors.kWhite,
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: context.paddingVerticalLow,
-                            child: CheckboxListTile.adaptive(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  "New Line",
-                                  style: context.textTheme.labelMedium,
-                                ),
-                                activeColor: AppColors.kPrimaryLight,
-                                checkboxShape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  side: const BorderSide(
-                                    color: AppColors.kPrimaryLight,
-                                  ),
-                                ),
-                                checkColor: AppColors.kWhite,
-                                value: _isNewLine,
-                                side: const BorderSide(
-                                  color: AppColors.kPrimaryLight,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isNewLine = value ?? false;
-                                  });
-                                }),
-                          ),
-                          BorderedButton(
-                            text: "Repeat",
-                            onPressed: () {
-                              if (!_formKey.currentState!.validate()) {
-                                return;
-                              } else {
-                                BlocProvider.of<LocalTextBloc>(context).add(
-                                  RepeatTextEvent(
-                                    text: _textController.text,
-                                    newLine: _isNewLine,
-                                    times:
-                                        int.tryParse(_repeatController.text) ??
-                                            0,
-                                  ),
-                                );
-                              }
-                            },
-                            color: AppColors.kPrimaryLight,
-                            isBordered: false,
-                            textStyle: context.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.kWhite,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: context.dynamicHeight(0.02),
+                ),
                 BlocBuilder<LocalTextBloc, LocalTextState>(
                   builder: (context, state) {
                     if (state is LocalTextLoadingState) {
-                      return const CircularProgressIndicator();
+                      return const Expanded(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     } else if (state is LocalTextSuccessState) {
                       // Sonucu outputController'a atıyoruz
                       _outputController.text = state.text ?? "";

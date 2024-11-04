@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:text_repeater/features/presentation/views/home.dart';
 import 'package:text_repeater/features/presentation/views/onboard.dart';
 import 'package:text_repeater/features/presentation/views/text_repeater.dart';
+import '../../features/presentation/views/text_randomizer.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -27,7 +28,7 @@ class AppRouter {
       case RouteNames.textRandomizer:
         return _fadeRoute(
           settings: settings,
-          view: const Home(),
+          view: const TextRandomizer(),
         );
       case RouteNames.wordCloud:
         return _fadeRoute(

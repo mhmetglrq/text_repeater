@@ -59,13 +59,11 @@ class _TextRepeaterState extends State<TextRepeater> {
                 ),
                 Padding(
                   padding: context.paddingTopDefault,
-                  child: Card(
-                    color: AppColors.kWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(
-                        color: AppColors.kBlue20,
-                      ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.kWhite,
+                      border: ContainerBorders.containerMediumBorder,
+                      borderRadius: ContainerBorders.borderRadius,
                     ),
                     child: Padding(
                       padding: context.paddingAllDefault,
@@ -158,6 +156,9 @@ class _TextRepeaterState extends State<TextRepeater> {
                       ),
                     ),
                   ),
+                ),
+                SizedBox(
+                  height: context.dynamicHeight(0.02),
                 ),
                 BlocBuilder<LocalTextBloc, LocalTextState>(
                   builder: (context, state) {
