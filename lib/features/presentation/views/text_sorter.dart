@@ -25,7 +25,6 @@ class _TextSortingState extends State<TextSorting> {
   final TextEditingController _repeatController = TextEditingController();
   final TextEditingController _outputController =
       TextEditingController(); // Output için TextEditingController
-  final bool _isNewLine = false;
   final _formKey = GlobalKey<FormState>();
 
   @override

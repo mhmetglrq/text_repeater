@@ -13,19 +13,18 @@ import '../../../config/items/colors/app_colors.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
-class TextRepeater extends StatefulWidget {
-  const TextRepeater({super.key});
+class TextReverser extends StatefulWidget {
+  const TextReverser({super.key});
 
   @override
-  State<TextRepeater> createState() => _TextRepeaterState();
+  State<TextReverser> createState() => _TextReverserState();
 }
 
-class _TextRepeaterState extends State<TextRepeater> {
+class _TextReverserState extends State<TextReverser> {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _repeatController = TextEditingController();
   final TextEditingController _outputController =
       TextEditingController(); // Output için TextEditingController
-  bool _isNewLine = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -54,7 +53,7 @@ class _TextRepeaterState extends State<TextRepeater> {
             child: Column(
               children: [
                 const CustomAppBar(
-                  title: 'Text Repeater',
+                  title: 'Text Reverser',
                 ),
                 Padding(
                   padding: context.paddingTopDefault,
@@ -69,6 +68,7 @@ class _TextRepeaterState extends State<TextRepeater> {
                       child: Column(
                         children: [
                           InputField(
+                            maxLines: 5,
                             labelText: "Text",
                             controller: _textController,
                             validator: (value) {
@@ -79,76 +79,25 @@ class _TextRepeaterState extends State<TextRepeater> {
                             },
                           ),
                           Padding(
-                            padding: context.paddingVerticalLow,
-                            child: InputField(
-                              labelText: "Repeat Count",
-                              controller: _repeatController,
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please enter a repeat count";
-                                } else if (value == "0") {
-                                  return "Please enter a number greater than 0";
-                                } else if (int.tryParse(value) == null) {
-                                  return "Please enter a valid number";
-                                } else if (value.length > 4) {
-                                  return "Please enter a number less than 10000";
+                            padding: context.paddingTopDefault,
+                            child: BorderedButton(
+                              text: "Reverse Text",
+                              onPressed: () {
+                                if (!_formKey.currentState!.validate()) {
+                                  return;
+                                } else {
+                                  BlocProvider.of<LocalTextBloc>(context).add(
+                                    ReverseTextEvent(
+                                      text: _textController.text,
+                                    ),
+                                  );
                                 }
-
-                                return null;
                               },
-                            ),
-                          ),
-                          Padding(
-                            padding: context.paddingVerticalLow,
-                            child: CheckboxListTile.adaptive(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  "New Line",
-                                  style: context.textTheme.labelMedium,
-                                ),
-                                activeColor: AppColors.kPrimaryLight,
-                                checkboxShape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  side: const BorderSide(
-                                    color: AppColors.kPrimaryLight,
-                                  ),
-                                ),
-                                checkColor: AppColors.kWhite,
-                                value: _isNewLine,
-                                side: const BorderSide(
-                                  color: AppColors.kPrimaryLight,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isNewLine = value ?? false;
-                                  });
-                                }),
-                          ),
-                          BorderedButton(
-                            text: "Repeat",
-                            onPressed: () {
-                              if (!_formKey.currentState!.validate()) {
-                                return;
-                              } else {
-                                BlocProvider.of<LocalTextBloc>(context).add(
-                                  RepeatTextEvent(
-                                    text: _textController.text,
-                                    newLine: _isNewLine,
-                                    times:
-                                        int.tryParse(_repeatController.text) ??
-                                            0,
-                                  ),
-                                );
-                              }
-                            },
-                            color: AppColors.kPrimaryLight,
-                            isBordered: false,
-                            textStyle: context.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.kWhite,
+                              color: AppColors.kPrimaryLight,
+                              isBordered: false,
+                              textStyle: context.textTheme.bodyMedium?.copyWith(
+                                color: AppColors.kWhite,
+                              ),
                             ),
                           ),
                         ],

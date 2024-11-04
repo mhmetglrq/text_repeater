@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/randomize_text_usecase.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/repeat_text_usecase.dart';
+import 'package:text_repeater/features/domain/usecases/text/local/reverse_text_usecase.dart';
 
 import '../../../../domain/usecases/text/local/sort_text_usecase.dart';
 
@@ -12,13 +13,15 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
   final RepeatTextUsecase _repeatTextUsecase;
   final RandomizeTextUsecase _randomizeTextUsecase;
   final SortTextUsecase _sortTextUsecase;
+  final ReverseTextUsecase _reverseTextUsecase;
   LocalTextBloc(this._repeatTextUsecase, this._randomizeTextUsecase,
-      this._sortTextUsecase)
+      this._sortTextUsecase, this._reverseTextUsecase)
       : super(const LocalTextInitialState()) {
     on<RepeatTextEvent>(onRepeatText);
     on<RemoveTextEvent>(onRemoveText);
     on<RandomizeTextEvent>(onRandomizeText);
     on<SortTextEvent>(onSortingText);
+    on<ReverseTextEvent>(onReverseText);
   }
 
   void onRepeatText(RepeatTextEvent event, Emitter<LocalTextState> emit) async {
@@ -49,7 +52,18 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
   }
 
   void onSortingText(SortTextEvent event, Emitter<LocalTextState> emit) async {
+    emit(const LocalTextLoadingState());
     await _sortTextUsecase(params: event.text).then((text) {
+      emit(LocalTextSuccessState(text: text));
+    }).catchError((error) {
+      emit(LocalTextErrorState(message: error.toString()));
+    });
+  }
+
+  void onReverseText(
+      ReverseTextEvent event, Emitter<LocalTextState> emit) async {
+    emit(const LocalTextLoadingState());
+    await _reverseTextUsecase(params: event.text).then((text) {
       emit(LocalTextSuccessState(text: text));
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));

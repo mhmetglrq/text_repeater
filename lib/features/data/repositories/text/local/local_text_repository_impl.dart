@@ -1,6 +1,5 @@
 import 'package:text_repeater/config/models/text_model.dart';
 import 'package:text_repeater/features/data/data_sources/local/hive_database_service.dart';
-import 'dart:math';
 
 import '../../../../domain/repositories/text/local/local_text_repository.dart';
 

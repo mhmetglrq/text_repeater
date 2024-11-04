@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
-import 'package:text_repeater/features/presentation/bloc/onboard/local/local_onboard_bloc.dart';
 import 'package:text_repeater/features/presentation/bloc/text/local/local_text_bloc.dart';
 
 import '../items/borders/container_borders.dart';

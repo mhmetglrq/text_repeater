@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:text_repeater/features/presentation/views/home.dart';
 import 'package:text_repeater/features/presentation/views/onboard.dart';
 import 'package:text_repeater/features/presentation/views/text_repeater.dart';
-import 'package:text_repeater/features/presentation/views/text_sorting.dart';
+import 'package:text_repeater/features/presentation/views/text_reverser.dart';
+import 'package:text_repeater/features/presentation/views/text_sorter.dart';
 import '../../features/presentation/views/text_randomizer.dart';
 import 'route_names.dart';
 
@@ -44,7 +45,7 @@ class AppRouter {
       case RouteNames.reverseText:
         return _fadeRoute(
           settings: settings,
-          view: const Home(),
+          view: const TextReverser(),
         );
 
       default:
