@@ -21,13 +21,14 @@ class TextModelAdapter extends TypeAdapter<TextModel> {
       createdAt: fields[1] as DateTime?,
       type: fields[2] as String?,
       repeatCount: fields[3] as int?,
+      isNewLine: fields[4] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TextModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.text)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class TextModelAdapter extends TypeAdapter<TextModel> {
       ..writeByte(2)
       ..write(obj.type)
       ..writeByte(3)
-      ..write(obj.repeatCount);
+      ..write(obj.repeatCount)
+      ..writeByte(4)
+      ..write(obj.isNewLine);
   }
 
   @override
