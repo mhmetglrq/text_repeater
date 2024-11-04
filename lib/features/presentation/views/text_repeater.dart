@@ -6,7 +6,6 @@ import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/utility/utils/utils.dart';
 import 'package:text_repeater/config/widgets/bordered_button.dart';
 import 'package:text_repeater/config/widgets/input_field.dart';
-import 'package:text_repeater/features/presentation/views/home.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../config/items/borders/container_borders.dart';
