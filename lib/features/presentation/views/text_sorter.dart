@@ -11,6 +11,7 @@ import 'package:toastification/toastification.dart';
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/models/text_model.dart';
+import '../../../config/utility/helpers/ad_helper.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
@@ -37,6 +38,7 @@ class _TextSortingState extends State<TextSorting> {
       context.read<LocalTextBloc>().add(
             SortTextEvent(
               text: widget.textModel!.text ?? "",
+              isRecent: true,
             ),
           );
     }
@@ -123,7 +125,19 @@ class _TextSortingState extends State<TextSorting> {
                 SizedBox(
                   height: context.dynamicHeight(0.02),
                 ),
-                BlocBuilder<LocalTextBloc, LocalTextState>(
+                BlocConsumer<LocalTextBloc, LocalTextState>(
+                  listener: (BuildContext context, LocalTextState state) {
+                    if (state is LocalTextSuccessState) {
+                      if ((state.adCount ?? 1) % 3 == 0) {
+                        AdMobHelper().showRewardedInterstitialAd(
+                            onRewarded: () {
+                          context
+                              .read<LocalTextBloc>()
+                              .add(const IncrementAdCountEvent());
+                        });
+                      }
+                    }
+                  },
                   builder: (context, state) {
                     if (state is LocalTextLoadingState) {
                       return const CircularProgressIndicator();

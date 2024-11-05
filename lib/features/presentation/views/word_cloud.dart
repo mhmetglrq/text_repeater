@@ -20,6 +20,7 @@ import 'package:word_cloud/word_cloud_view.dart';
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/models/text_model.dart';
+import '../../../config/utility/helpers/ad_helper.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
@@ -46,6 +47,7 @@ class _WordCloudState extends State<WordCloud> {
       BlocProvider.of<LocalTextBloc>(context).add(
         WordCloudEvent(
           text: widget.textModel!.text ?? "",
+          isRecent: true,
         ),
       );
     }
@@ -112,12 +114,16 @@ class _WordCloudState extends State<WordCloud> {
                       child: Column(
                         children: [
                           InputField(
-                            maxLines: 5,
+                            maxLines: 2,
                             labelText: "Text",
                             controller: _textController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter a text";
+                              }
+                              //value tek bir kelime olmamalı
+                              else if (value.split(" ").length == 1) {
+                                return "Please enter more than one word";
                               }
                               return null;
                             },
@@ -152,7 +158,19 @@ class _WordCloudState extends State<WordCloud> {
                 SizedBox(
                   height: context.dynamicHeight(0.02),
                 ),
-                BlocBuilder<LocalTextBloc, LocalTextState>(
+                BlocConsumer<LocalTextBloc, LocalTextState>(
+                  listener: (BuildContext context, LocalTextState state) {
+                    if (state is LocalTextSuccessState) {
+                      if ((state.adCount ?? 1) % 3 == 0) {
+                        AdMobHelper().showRewardedInterstitialAd(
+                            onRewarded: () {
+                          context
+                              .read<LocalTextBloc>()
+                              .add(const IncrementAdCountEvent());
+                        });
+                      }
+                    }
+                  },
                   builder: (context, state) {
                     if (state is LocalTextLoadingState) {
                       return const CircularProgressIndicator();
@@ -175,6 +193,8 @@ class _WordCloudState extends State<WordCloud> {
                               child: RepaintBoundary(
                                 key: _wordCloudKey,
                                 child: WordCloudView(
+                                  mintextsize: 12,
+                                  maxtextsize: 120,
                                   data: wcdata,
                                   key: wordCloudKey,
                                   mapwidth: context.dynamicWidth(0.9),

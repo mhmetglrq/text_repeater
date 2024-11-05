@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart'; // Paylaşma paketi eklendi
+import 'package:share_plus/share_plus.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/utility/utils/utils.dart';
 import 'package:text_repeater/config/widgets/bordered_button.dart';
@@ -11,6 +13,7 @@ import 'package:toastification/toastification.dart';
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/models/text_model.dart';
+import '../../../config/utility/helpers/ad_helper.dart';
 import '../../../config/widgets/custom_appbar.dart';
 import '../bloc/text/local/local_text_bloc.dart';
 
@@ -41,6 +44,7 @@ class _TextRepeaterState extends State<TextRepeater> {
               text: _textController.text,
               newLine: _isNewLine,
               times: widget.textModel?.repeatCount ?? 0,
+              isRecent: true,
             ),
           );
     }
@@ -148,10 +152,13 @@ class _TextRepeaterState extends State<TextRepeater> {
                           ),
                           BorderedButton(
                             text: "Repeat",
-                            onPressed: () {
+                            onPressed: () async {
                               if (!_formKey.currentState!.validate()) {
                                 return;
                               } else {
+                                context
+                                    .read<LocalTextBloc>()
+                                    .add(const IncrementAdCountEvent());
                                 BlocProvider.of<LocalTextBloc>(context).add(
                                   RepeatTextEvent(
                                     text: _textController.text,
@@ -177,7 +184,7 @@ class _TextRepeaterState extends State<TextRepeater> {
                 SizedBox(
                   height: context.dynamicHeight(0.02),
                 ),
-                BlocBuilder<LocalTextBloc, LocalTextState>(
+                BlocConsumer<LocalTextBloc, LocalTextState>(
                   builder: (context, state) {
                     if (state is LocalTextLoadingState) {
                       return const CircularProgressIndicator();
@@ -262,6 +269,19 @@ class _TextRepeaterState extends State<TextRepeater> {
                       );
                     } else {
                       return const SizedBox();
+                    }
+                  },
+                  listener: (BuildContext context, LocalTextState state) {
+                    if (state is LocalTextSuccessState) {
+                      if ((state.adCount ?? 1) % 3 == 0) {
+                        AdMobHelper().showRewardedInterstitialAd(
+                            onRewarded: () {
+                          context
+                              .read<LocalTextBloc>()
+                              .add(const IncrementAdCountEvent());
+                        });
+                      }
+                      log("Ad count: ${state.adCount}");
                     }
                   },
                 ),

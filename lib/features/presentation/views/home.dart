@@ -4,15 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:text_repeater/config/constants/menu_constants.dart';
 import 'package:text_repeater/config/extensions/context_extensions.dart';
-import 'package:text_repeater/config/models/text_model.dart';
-import 'package:text_repeater/config/utility/enum/text_features.dart';
-import 'package:text_repeater/config/utility/utils/utils.dart';
 
 import '../../../config/items/borders/container_borders.dart';
 import '../../../config/items/colors/app_colors.dart';
 import '../../../config/utility/enum/assets_enum.dart';
-import '../../../config/widgets/custom_appbar.dart';
+import '../../../config/utility/helpers/ad_helper.dart';
 import '../bloc/text/local/local_text_bloc.dart';
+import 'widget/recent_item.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -135,12 +133,6 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      'See all',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.kBlue100,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -181,68 +173,7 @@ class _HomeState extends State<Home> {
                   },
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class RecentItem extends StatelessWidget {
-  const RecentItem({
-    super.key,
-    required this.textModel,
-  });
-
-  final TextModel textModel;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          textModel.type?.getPath() ?? "",
-          arguments: textModel,
-        );
-      },
-      child: Padding(
-        padding: context.paddingBottomLow,
-        child: Container(
-          padding: context.paddingAllDefault,
-          decoration: BoxDecoration(
-            border: ContainerBorders.containerMediumBorder,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${textModel.type?.toEnum()}",
-                style: context.textTheme.headlineMedium?.copyWith(
-                  color: AppColors.kNeutral40,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-              Text(
-                textModel.text ?? "",
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.kBlue100,
-                  fontWeight: FontWeight.w400,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                Utils.getTimeDifference(textModel.createdAt ?? DateTime.now()),
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.kNeutral40,
-                  fontWeight: FontWeight.w300,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              AdMobHelper().getBannerAdWidget(),
             ],
           ),
         ),
