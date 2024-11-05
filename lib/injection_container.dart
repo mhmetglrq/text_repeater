@@ -11,6 +11,7 @@ import 'package:text_repeater/features/domain/usecases/text/local/sort_text_usec
 import 'package:text_repeater/features/presentation/bloc/text/local/local_text_bloc.dart';
 
 import 'config/models/text_model.dart';
+import 'config/utility/helpers/ad_helper.dart';
 import 'features/data/data_sources/local/hive_database_service.dart';
 import 'features/data/repositories/text/local/local_text_repository_impl.dart';
 import 'features/domain/repositories/onboard/local/local_onboard_repository.dart';
@@ -21,6 +22,7 @@ import 'features/presentation/bloc/onboard/local/local_onboard_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
+  AdMobHelper().initialize();
   await Hive.initFlutter();
   // Dio
   // sl.registerSingleton<Dio>(Dio());
@@ -45,5 +47,5 @@ Future<void> initializeDependencies() async {
   //Blocs
   sl.registerFactory<LocalOnboardBloc>(() => LocalOnboardBloc(sl(), sl()));
   sl.registerFactory<LocalTextBloc>(
-      () => LocalTextBloc(sl(), sl(), sl(), sl(), sl(),sl()));
+      () => LocalTextBloc(sl(), sl(), sl(), sl(), sl(), sl()));
 }
