@@ -23,7 +23,7 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
   }
 
   @override
-  Future<String> randomizeText({required String text}) async {
+  Future<String> randomizeText({required String text, bool? isRecent}) async {
     List<String> words = text.split(' ');
     words.shuffle(); // Kelimeleri karıştır
     TextModel textModel = TextModel(
@@ -31,13 +31,16 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
         createdAt: DateTime.now(),
         type: 'randomize',
         repeatCount: 0);
-    await saveText(textModel: textModel);
+    await saveText(textModel: textModel, isRecent: isRecent);
     return words.join(' '); // Yeniden birleştir ve döndür
   }
 
   @override
   Future<String> repeatText(
-      {required String text, required int times, required bool newLine}) async {
+      {required String text,
+      required int times,
+      required bool newLine,
+      bool? isRecent}) async {
     String separator = newLine ? '\n' : ' ';
 
     TextModel textModel = TextModel(
@@ -47,35 +50,37 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
         repeatCount: times,
         isNewLine: newLine);
 
-    await saveText(textModel: textModel);
+    await saveText(textModel: textModel, isRecent: isRecent);
     return List.filled(times, text)
         .join(separator); // Metni belirtilen sayıda tekrarla
   }
 
   @override
-  Future<String> reverseText({required String text}) async {
+  Future<String> reverseText({required String text, bool? isRecent}) async {
     TextModel textModel = TextModel(
         text: text.split('').reversed.join(),
         createdAt: DateTime.now(),
         type: 'reverse',
         repeatCount: 0);
-    await saveText(textModel: textModel);
+    await saveText(textModel: textModel, isRecent: isRecent);
     return text.split('').reversed.join(); // Metni ters çevir
   }
 
   @override
-  Future<void> saveText({required TextModel textModel}) async {
-    List<TextModel> savedTexts = await getSavedTexts();
-    if (savedTexts.length >= 10) {
-      savedTexts.removeAt(0);
-    }
+  Future<void> saveText({required TextModel textModel, bool? isRecent}) async {
+    if (isRecent == false || isRecent == null) {
+      List<TextModel> savedTexts = await getSavedTexts();
+      if (savedTexts.length >= 10) {
+        savedTexts.removeAt(0);
+      }
 
-    savedTexts.add(textModel);
-    await _databaseService.putData("recents", "text", savedTexts);
+      savedTexts.add(textModel);
+      await _databaseService.putData("recents", "text", savedTexts);
+    }
   }
 
   @override
-  Future<String> sortText({required String text}) async {
+  Future<String> sortText({required String text, bool? isRecent}) async {
     List<String> words = text.split(' ');
     words.sort(); // Alfabetik sıraya göre sırala
 
@@ -84,12 +89,13 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
         createdAt: DateTime.now(),
         type: 'sort',
         repeatCount: 0);
-    await saveText(textModel: textModel);
+    await saveText(textModel: textModel, isRecent: isRecent);
     return words.join(' '); // Yeniden birleştir ve döndür
   }
 
   @override
-  Future<List<Map<String, dynamic>>> wordCloud({required String text}) async {
+  Future<List<Map<String, dynamic>>> wordCloud(
+      {required String text, bool? isRecent}) async {
     // Kelime sıklığını hesaplayan metot
     Map<String, dynamic> wordMap = {};
     List<String> words = text.split(' ');
@@ -113,7 +119,7 @@ class LocalTextRepositoryImpl implements LocalTextRepository {
         type: 'wordCloud',
         repeatCount: 0);
 
-    await saveText(textModel: textModel);
+    await saveText(textModel: textModel, isRecent: isRecent);
     return wordList;
   }
 }
