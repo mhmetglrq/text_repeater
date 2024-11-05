@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:text_repeater/features/domain/usecases/text/local/create_word_cloud_usecase.dart';
@@ -26,7 +28,9 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
     this._reverseTextUsecase,
     this._createWordCloudUseCase,
     this._getSavedTextsUsecase,
-  ) : super(const LocalTextInitialState()) {
+  ) : super(const LocalTextInitialState(
+          adCount: 0,
+        )) {
     on<RepeatTextEvent>(onRepeatText);
     on<RemoveTextEvent>(onRemoveText);
     on<RandomizeTextEvent>(onRandomizeText);
@@ -34,39 +38,75 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
     on<ReverseTextEvent>(onReverseText);
     on<WordCloudEvent>(onCreateWordCloud);
     on<GetSavedTextsEvent>(onGetSavedTexts);
+    on<IncrementAdCountEvent>(onIncrementAdCount);
   }
 
   void onRepeatText(RepeatTextEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextLoadingState());
+    emit(LocalTextLoadingState(
+      adCount: state.adCount,
+    ));
+
     await _repeatTextUsecase(
             params: RepeatTextParams(
-                text: event.text, times: event.times, newLine: event.newLine))
+                text: event.text!,
+                times: event.times,
+                newLine: event.newLine,
+                isRecent: event.isRecent))
         .then((text) {
-      emit(LocalTextSuccessState(text: text, savedTexts: state.savedTexts));
+      emit(
+        LocalTextSuccessState(
+          text: text,
+          savedTexts: state.savedTexts,
+          adCount: state.adCount,
+        ),
+      );
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
   }
 
   void onRemoveText(RemoveTextEvent event, Emitter<LocalTextState> emit) {
-    emit(const LocalTextInitialState());
+    emit(LocalTextInitialState(
+      adCount: state.adCount,
+    ));
   }
 
   void onRandomizeText(
       RandomizeTextEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextLoadingState());
-    await _randomizeTextUsecase(params: RandomizeTextParams(text: event.text))
-        .then((text) {
-      emit(LocalTextSuccessState(text: text));
+    emit(LocalTextLoadingState(
+      adCount: state.adCount,
+    ));
+
+    await _randomizeTextUsecase(
+        params: RandomizeTextParams(
+      text: event.text!,
+      isRecent: event.isRecent,
+    )).then((text) {
+      emit(
+        LocalTextSuccessState(
+          text: text,
+          adCount: state.adCount,
+        ),
+      );
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
   }
 
   void onSortingText(SortTextEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextLoadingState());
-    await _sortTextUsecase(params: event.text).then((text) {
-      emit(LocalTextSuccessState(text: text));
+    emit(LocalTextLoadingState(
+      adCount: state.adCount,
+    ));
+
+    await _sortTextUsecase(
+            params: SortTextParams(text: event.text!, isRecent: event.isRecent))
+        .then((text) {
+      emit(
+        LocalTextSuccessState(
+          text: text,
+          adCount: state.adCount,
+        ),
+      );
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
@@ -74,9 +114,20 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
 
   void onReverseText(
       ReverseTextEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextLoadingState());
-    await _reverseTextUsecase(params: event.text).then((text) {
-      emit(LocalTextSuccessState(text: text));
+    emit(LocalTextLoadingState(
+      adCount: state.adCount,
+    ));
+
+    await _reverseTextUsecase(
+            params:
+                ReverseTextParams(text: event.text!, isRecent: event.isRecent))
+        .then((text) {
+      emit(
+        LocalTextSuccessState(
+          text: text,
+          adCount: state.adCount,
+        ),
+      );
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
@@ -84,9 +135,22 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
 
   void onCreateWordCloud(
       WordCloudEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextLoadingState());
-    await _createWordCloudUseCase(params: event.text).then((wordCloudList) {
-      emit(LocalTextSuccessState(wordCloudList: wordCloudList));
+    emit(LocalTextLoadingState(
+      adCount: state.adCount,
+    ));
+
+    await _createWordCloudUseCase(
+      params: CreateWordCloudUseCaseParams(
+        text: event.text!,
+        isRecent: event.isRecent,
+      ),
+    ).then((wordCloudList) {
+      emit(
+        LocalTextSuccessState(
+          wordCloudList: wordCloudList,
+          adCount: state.adCount,
+        ),
+      );
     }).catchError((error) {
       emit(LocalTextErrorState(message: error.toString()));
     });
@@ -94,7 +158,9 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
 
   void onGetSavedTexts(
       GetSavedTextsEvent event, Emitter<LocalTextState> emit) async {
-    emit(const LocalTextSavedTextsLoadingState());
+    emit(LocalTextSavedTextsLoadingState(
+      adCount: state.adCount,
+    ));
     await _getSavedTextsUsecase().then((savedTexts) {
       emit(LocalTextSavedTextsSuccessState(
         savedTexts: savedTexts.reversed.toList(),
@@ -102,5 +168,15 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
     }).catchError((error) {
       emit(LocalTextSavedTextsErrorState(message: error.toString()));
     });
+  }
+
+  void onIncrementAdCount(
+      IncrementAdCountEvent event, Emitter<LocalTextState> emit) {
+    int adCount = state.adCount ?? 0;
+    adCount++;
+
+    emit(LocalTextSuccessState(
+        adCount: adCount, text: state.text, savedTexts: state.savedTexts));
+    log("Ad count 2: $adCount");
   }
 }
