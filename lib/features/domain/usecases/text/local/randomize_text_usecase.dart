@@ -10,14 +10,17 @@ class RandomizeTextUsecase implements UseCase<String, RandomizeTextParams> {
   Future<String> call({params}) async {
     return await _localTextRepository.randomizeText(
       text: params!.text,
+      isRecent: params.isRecent,
     );
   }
 }
 
 class RandomizeTextParams {
   final String text;
+  final bool? isRecent;
 
   RandomizeTextParams({
     required this.text,
+    this.isRecent,
   });
 }

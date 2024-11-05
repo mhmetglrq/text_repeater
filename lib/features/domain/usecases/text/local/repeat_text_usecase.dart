@@ -17,7 +17,11 @@ class RepeatTextParams {
   final String text;
   final int times;
   final bool newLine;
+  final bool? isRecent;
 
   RepeatTextParams(
-      {required this.text, required this.times, required this.newLine});
+      {required this.text,
+      required this.times,
+      required this.newLine,
+      this.isRecent});
 }
