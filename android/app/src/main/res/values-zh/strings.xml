@@ -1,0 +1,4 @@
+<!-- res/values-zh/strings.xml -->
+<resources>
+  <string name="app_name">文本重复器</string>
+</resources>

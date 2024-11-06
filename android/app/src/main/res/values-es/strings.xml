@@ -1,0 +1,4 @@
+<!-- res/values-es/strings.xml -->
+<resources>
+  <string name="app_name">Repetidor de Texto</string>
+</resources>

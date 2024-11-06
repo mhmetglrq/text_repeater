@@ -1,0 +1,4 @@
+<!-- res/values-ru/strings.xml -->
+<resources>
+  <string name="app_name">Повторитель текста</string>
+</resources>
