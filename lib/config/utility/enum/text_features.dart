@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:text_repeater/config/extensions/context_extensions.dart';
 import 'package:text_repeater/config/router/route_names.dart';
 
 enum TextFeatures {
@@ -44,6 +46,27 @@ extension ConvertType on String {
         return RouteNames.wordCloud;
       default:
         return RouteNames.textRepeater;
+    }
+  }
+
+  String localizedName(BuildContext context) {
+    switch (this) {
+      case 'repeat':
+        return context.locale?.repeatTextMenuTitle ??
+            TextFeatures.textRepeater.title;
+      case 'randomize':
+        return context.locale?.randomTextMenuTitle ??
+            TextFeatures.textRandomize.title;
+      case 'sort':
+        return context.locale?.sortTextMenuTitle ?? TextFeatures.textSort.title;
+      case 'reverse':
+        return context.locale?.reverseTextMenuTitle ??
+            TextFeatures.textReverse.title;
+      case 'wordCloud':
+        return context.locale?.wordCloudMenuTitle ??
+            TextFeatures.textWordCloud.title;
+      default:
+        return TextFeatures.textRepeater.title;
     }
   }
 }

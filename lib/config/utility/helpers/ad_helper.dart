@@ -78,7 +78,8 @@ class AdMobHelper {
   }
 
   /// Rewarded Interstitial Ad gösterici
-  void showRewardedInterstitialAd({required Function onRewarded}) {
+  void showRewardedInterstitialAd(
+      {required Function onRewarded, required Function onDismissed}) {
     if (_isRewardedInterstitialAdLoaded) {
       _rewardedInterstitialAd.show(
         onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
@@ -90,6 +91,7 @@ class AdMobHelper {
       _rewardedInterstitialAd.fullScreenContentCallback =
           FullScreenContentCallback(
         onAdDismissedFullScreenContent: (RewardedInterstitialAd ad) {
+          onDismissed();
           ad.dispose();
           loadRewardedInterstitialAd(); // Reklam kapandıktan sonra yeni reklamı yükler
         },

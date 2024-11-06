@@ -24,7 +24,9 @@ class Utils {
         ),
       ),
       alignment: Alignment.topRight,
-      direction: TextDirection.ltr,
+      direction: context.locale?.localeName == "ar"
+          ? TextDirection.rtl
+          : TextDirection.ltr,
       animationDuration: const Duration(milliseconds: 300),
       animationBuilder: (context, animation, alignment, child) {
         return FadeTransition(
@@ -45,20 +47,4 @@ class Utils {
       closeButtonShowType: CloseButtonShowType.onHover,
     );
   }
-
-  static String getTimeDifference(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return '${difference.inSeconds}s ago';
-    }
-  }
-
-  
 }
