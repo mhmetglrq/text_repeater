@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 extension MediaQueryExtension on BuildContext {
   MediaQueryData get mediaQuery => MediaQuery.of(this);
@@ -123,4 +124,8 @@ extension ThemeExtension on BuildContext {
 
   /// Get the brightness
   Brightness get brightness => Theme.of(this).brightness;
+}
+
+extension LocaleExtension on BuildContext {
+  AppLocalizations? get locale => AppLocalizations.of(this);
 }
