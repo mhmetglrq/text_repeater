@@ -62,172 +62,201 @@ class _TextReverserState extends State<TextReverser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: context.paddingAllDefault,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const CustomAppBar(
-                  title: 'Text Reverser',
-                ),
-                Padding(
-                  padding: context.paddingTopDefault,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.kWhite,
-                      border: ContainerBorders.containerMediumBorder,
-                      borderRadius: ContainerBorders.borderRadius,
+      body: Directionality(
+        textDirection: context.locale?.localeName == "ar"
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: BlocConsumer<LocalTextBloc, LocalTextState>(
+          listener: (context, state) {
+            if (state is LocalTextSuccessState) {
+              if ((state.adCount ?? 1) % 3 == 0) {
+                AdMobHelper().showRewardedInterstitialAd(onRewarded: () {
+                  BlocProvider.of<LocalTextBloc>(context).add(
+                    ReverseTextEvent(
+                      text: _textController.text,
                     ),
-                    child: Padding(
-                      padding: context.paddingAllDefault,
-                      child: Column(
-                        children: [
-                          InputField(
-                            maxLines: 5,
-                            labelText: "Text",
-                            controller: _textController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please enter a text";
-                              }
-                              return null;
-                            },
-                          ),
-                          Padding(
-                            padding: context.paddingTopDefault,
-                            child: BorderedButton(
-                              text: "Reverse Text",
-                              onPressed: () {
-                                if (!_formKey.currentState!.validate()) {
-                                  return;
-                                } else {
-                                  BlocProvider.of<LocalTextBloc>(context).add(
-                                    ReverseTextEvent(
-                                      text: _textController.text,
-                                    ),
-                                  );
-                                }
-                              },
-                              color: AppColors.kPrimaryLight,
-                              isBordered: false,
-                              textStyle: context.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.kWhite,
-                              ),
-                            ),
-                          ),
-                        ],
+                  );
+                }, onDismissed: () {
+                  context
+                      .read<LocalTextBloc>()
+                      .add(const IncrementAdCountEvent(adCount: 3));
+                });
+              }
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Padding(
+                padding: context.paddingAllDefault,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomAppBar(
+                        title: "${context.locale?.reverseTextMenuTitle}",
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: context.dynamicHeight(0.02),
-                ),
-                BlocConsumer<LocalTextBloc, LocalTextState>(
-                  builder: (context, state) {
-                    if (state is LocalTextLoadingState) {
-                      return const CircularProgressIndicator();
-                    } else if (state is LocalTextSuccessState) {
-                      // Sonucu outputController'a atıyoruz
-                      _outputController.text = state.text ?? "";
-
-                      return Expanded(
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.kWhite,
-                                  border:
-                                      ContainerBorders.containerMediumBorder,
-                                  borderRadius: ContainerBorders.borderRadius,
-                                ),
-                                padding: context.paddingAllDefault,
-                                child: GestureDetector(
-                                  onTap:
-                                      _selectAllText, // Dokunulduğunda tüm metni seç
-                                  child: TextField(
-                                    controller: _outputController,
-                                    readOnly: true, // Metin düzenlenemez
-                                    maxLines:
-                                        null, // Metnin tamamını göstermek için
-                                    style: context.textTheme.bodyMedium,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    textAlign: TextAlign.justify,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Row(
+                      Padding(
+                        padding: context.paddingTopDefault,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.kWhite,
+                            border: ContainerBorders.containerMediumBorder,
+                            borderRadius: ContainerBorders.borderRadius,
+                          ),
+                          child: Padding(
+                            padding: context.paddingAllDefault,
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Copy",
-                                    onPressed: () {
-                                      // Metni panoya kopyala
-                                      Clipboard.setData(ClipboardData(
-                                          text: _outputController.text));
-                                      Utils.showNotification(
-                                        context,
-                                        "Copied to clipboard",
-                                        "The text has been copied to the clipboard.",
-                                        type: ToastificationType.success,
-                                      );
-                                    },
-                                  ),
+                                InputField(
+                                  maxLines: 5,
+                                  labelText: "${context.locale?.text}",
+                                  controller: _textController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "${context.locale?.textValid}";
+                                    }
+                                    return null;
+                                  },
                                 ),
-                                SizedBox(width: context.dynamicWidth(0.02)),
-                                Expanded(
+                                Padding(
+                                  padding: context.paddingTopDefault,
                                   child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Share",
+                                    text: "${context.locale?.reverse}",
                                     onPressed: () {
-                                      // Metni paylaş
-                                      Share.share(_outputController.text);
+                                      if (!_formKey.currentState!.validate()) {
+                                        return;
+                                      } else {
+                                        context
+                                            .read<LocalTextBloc>()
+                                            .add(const IncrementAdCountEvent());
+                                        if (((state.adCount ?? 1) + 1) % 3 !=
+                                            0) {
+                                          BlocProvider.of<LocalTextBloc>(
+                                                  context)
+                                              .add(
+                                            ReverseTextEvent(
+                                              text: _textController.text,
+                                            ),
+                                          );
+                                        }
+                                      }
                                     },
+                                    color: AppColors.kPrimaryLight,
+                                    isBordered: false,
+                                    textStyle:
+                                        context.textTheme.bodyMedium?.copyWith(
+                                      color: AppColors.kWhite,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      );
-                    } else if (state is LocalTextErrorState) {
-                      return Padding(
-                        padding: context.paddingTopDefault,
-                        child: Text(state.message ?? ""),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
-                  listener: (BuildContext context, LocalTextState state) {
-                    if (state is LocalTextSuccessState) {
-                      if ((state.adCount ?? 1) % 3 == 0) {
-                        AdMobHelper().showRewardedInterstitialAd(
-                            onRewarded: () {
-                          context
-                              .read<LocalTextBloc>()
-                              .add(const IncrementAdCountEvent());
-                        });
-                      }
-                    }
-                  },
+                      ),
+                      SizedBox(
+                        height: context.dynamicHeight(0.02),
+                      ),
+                      BlocBuilder<LocalTextBloc, LocalTextState>(
+                        builder: (context, state) {
+                          if (state is LocalTextLoadingState) {
+                            return const CircularProgressIndicator();
+                          } else if (state is LocalTextSuccessState) {
+                            // Sonucu outputController'a atıyoruz
+                            _outputController.text = state.text ?? "";
+
+                            return Expanded(
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.kWhite,
+                                        border: ContainerBorders
+                                            .containerMediumBorder,
+                                        borderRadius:
+                                            ContainerBorders.borderRadius,
+                                      ),
+                                      padding: context.paddingAllDefault,
+                                      child: GestureDetector(
+                                        onTap:
+                                            _selectAllText, // Dokunulduğunda tüm metni seç
+                                        child: TextField(
+                                          controller: _outputController,
+                                          readOnly: true, // Metin düzenlenemez
+                                          maxLines:
+                                              null, // Metnin tamamını göstermek için
+                                          style: context.textTheme.bodyMedium,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                          ),
+                                          textAlign: TextAlign.justify,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: BorderedButton(
+                                          isBordered: false,
+                                          color: AppColors.kPrimaryLight,
+                                          textStyle: context
+                                              .textTheme.bodyMedium
+                                              ?.copyWith(
+                                                  color: AppColors.kWhite),
+                                          text: "${context.locale?.copy}",
+                                          onPressed: () {
+                                            // Metni panoya kopyala
+                                            Clipboard.setData(ClipboardData(
+                                                text: _outputController.text));
+                                            Utils.showNotification(
+                                              context,
+                                              "${context.locale?.copiedTitle}",
+                                              "${context.locale?.copiedMsg}",
+                                              type: ToastificationType.success,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          width: context.dynamicWidth(0.02)),
+                                      Expanded(
+                                        child: BorderedButton(
+                                          isBordered: false,
+                                          color: AppColors.kPrimaryLight,
+                                          textStyle: context
+                                              .textTheme.bodyMedium
+                                              ?.copyWith(
+                                                  color: AppColors.kWhite),
+                                          text: "${context.locale?.share}",
+                                          onPressed: () {
+                                            // Metni paylaş
+                                            Share.share(_outputController.text);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (state is LocalTextErrorState) {
+                            return Padding(
+                              padding: context.paddingTopDefault,
+                              child: Text(state.message ?? ""),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

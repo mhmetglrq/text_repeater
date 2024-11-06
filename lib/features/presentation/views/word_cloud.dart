@@ -76,13 +76,13 @@ class _WordCloudState extends State<WordCloud> {
         await imageFile.writeAsBytes(pngBytes);
         final xFile = XFile(imageFile.path);
         // Dosyayı paylaş
-        await Share.shareXFiles([xFile], text: "Check out this Word Cloud!");
+        await Share.shareXFiles([xFile], text: "${context.locale?.shareText}");
       }
     } catch (e) {
       Utils.showNotification(
         context,
-        "Error",
-        "Failed to share the image.",
+        "${context.locale?.errorTitle}",
+        "${context.locale?.shareImgErrorDesc}",
         type: ToastificationType.error,
       );
     }
@@ -91,190 +91,198 @@ class _WordCloudState extends State<WordCloud> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: context.paddingAllDefault,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const CustomAppBar(
-                  title: 'Word Cloud',
-                ),
-                Padding(
-                  padding: context.paddingTopDefault,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.kWhite,
-                      border: ContainerBorders.containerMediumBorder,
-                      borderRadius: ContainerBorders.borderRadius,
+      body: Directionality(
+        textDirection: context.locale?.localeName == "ar"
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: BlocConsumer<LocalTextBloc, LocalTextState>(
+          listener: (context, state) {
+            if (state is LocalTextSuccessState) {
+              if ((state.adCount ?? 1) % 3 == 0) {
+                AdMobHelper().showRewardedInterstitialAd(onRewarded: () {
+                  BlocProvider.of<LocalTextBloc>(context).add(
+                    WordCloudEvent(
+                      text: _textController.text,
                     ),
-                    child: Padding(
-                      padding: context.paddingAllDefault,
-                      child: Column(
-                        children: [
-                          InputField(
-                            maxLines: 2,
-                            labelText: "Text",
-                            controller: _textController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please enter a text";
-                              }
-                              //value tek bir kelime olmamalı
-                              else if (value.split(" ").length == 1) {
-                                return "Please enter more than one word";
-                              }
-                              return null;
-                            },
-                          ),
-                          Padding(
-                            padding: context.paddingTopDefault,
-                            child: BorderedButton(
-                              text: "Create Word Cloud",
-                              onPressed: () {
-                                if (!_formKey.currentState!.validate()) {
-                                  return;
-                                } else {
-                                  BlocProvider.of<LocalTextBloc>(context).add(
-                                    WordCloudEvent(
-                                      text: _textController.text,
-                                    ),
-                                  );
-                                }
-                              },
-                              color: AppColors.kPrimaryLight,
-                              isBordered: false,
-                              textStyle: context.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.kWhite,
-                              ),
-                            ),
-                          ),
-                        ],
+                  );
+                }, onDismissed: () {
+                  context
+                      .read<LocalTextBloc>()
+                      .add(const IncrementAdCountEvent(adCount: 3));
+                });
+              }
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Padding(
+                padding: context.paddingAllDefault,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomAppBar(
+                        title: "${context.locale?.wordCloudMenuTitle}",
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: context.dynamicHeight(0.02),
-                ),
-                BlocConsumer<LocalTextBloc, LocalTextState>(
-                  listener: (BuildContext context, LocalTextState state) {
-                    if (state is LocalTextSuccessState) {
-                      if ((state.adCount ?? 1) % 3 == 0) {
-                        AdMobHelper().showRewardedInterstitialAd(
-                            onRewarded: () {
-                          context
-                              .read<LocalTextBloc>()
-                              .add(const IncrementAdCountEvent());
-                        });
-                      }
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is LocalTextLoadingState) {
-                      return const CircularProgressIndicator();
-                    } else if (state is LocalTextSuccessState) {
-                      // Sonucu outputController'a atıyoruz
-                      wcdata.data = [];
-                      log(wcdata.data.toString());
-                      for (var element in state.wordCloudList ?? []) {
-                        wcdata.addData(element["word"],
-                            double.tryParse(element["value"].toString()) ?? 10);
-                      }
-                      log("second${wcdata.data}");
-
-                      wordCloudKey = UniqueKey();
-
-                      return Expanded(
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: RepaintBoundary(
-                                key: _wordCloudKey,
-                                child: WordCloudView(
-                                  mintextsize: 12,
-                                  maxtextsize: 120,
-                                  data: wcdata,
-                                  key: wordCloudKey,
-                                  mapwidth: context.dynamicWidth(0.9),
-                                  mapheight: context.dynamicHeight(0.4),
-                                  colorlist: const [
-                                    Colors.red,
-                                    Colors.pink,
-                                    Colors.purple,
-                                    Colors.deepPurple,
-                                    Colors.indigo,
-                                    Colors.blue,
-                                    Colors.lightBlue,
-                                    Colors.cyan,
-                                    Colors.teal,
-                                    Colors.green,
-                                    Colors.black,
-                                    Colors.lightGreen,
-                                    Colors.lime,
-                                    Colors.yellow,
-                                    Colors.amber,
-                                    Colors.orange,
-                                    Colors.deepOrange,
-                                    Colors.brown,
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Row(
+                      Padding(
+                        padding: context.paddingTopDefault,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.kWhite,
+                            border: ContainerBorders.containerMediumBorder,
+                            borderRadius: ContainerBorders.borderRadius,
+                          ),
+                          child: Padding(
+                            padding: context.paddingAllDefault,
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Copy",
-                                    onPressed: () {
-                                      //TODO: Copy image to clipboard
-
-                                      Utils.showNotification(
-                                        context,
-                                        "Copied to clipboard",
-                                        "The text has been copied to the clipboard.",
-                                        type: ToastificationType.success,
-                                      );
-                                    },
-                                  ),
+                                InputField(
+                                  maxLines: 2,
+                                  labelText: "${context.locale?.text}",
+                                  controller: _textController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "${context.locale?.textValid}";
+                                    }
+                                    //value tek bir kelime olmamalı
+                                    else if (value.split(" ").length == 1) {
+                                      return "${context.locale?.wordCloudValid}";
+                                    }
+                                    return null;
+                                  },
                                 ),
-                                SizedBox(width: context.dynamicWidth(0.02)),
-                                Expanded(
+                                Padding(
+                                  padding: context.paddingTopDefault,
                                   child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Share",
+                                    text: "${context.locale?.createWordCloud}",
                                     onPressed: () {
-                                      // Resmi Paylaş
-                                      _shareWidgetAsImage();
+                                      if (!_formKey.currentState!.validate()) {
+                                        return;
+                                      } else {
+                                        context
+                                            .read<LocalTextBloc>()
+                                            .add(const IncrementAdCountEvent());
+                                        if (((state.adCount ?? 1) + 1) % 3 !=
+                                            0) {
+                                          BlocProvider.of<LocalTextBloc>(
+                                                  context)
+                                              .add(
+                                            WordCloudEvent(
+                                              text: _textController.text,
+                                            ),
+                                          );
+                                        }
+                                      }
                                     },
+                                    color: AppColors.kPrimaryLight,
+                                    isBordered: false,
+                                    textStyle:
+                                        context.textTheme.bodyMedium?.copyWith(
+                                      color: AppColors.kWhite,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      );
-                    } else if (state is LocalTextErrorState) {
-                      return Padding(
-                        padding: context.paddingTopDefault,
-                        child: Text(state.message ?? ""),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
+                      ),
+                      SizedBox(
+                        height: context.dynamicHeight(0.02),
+                      ),
+                      BlocBuilder<LocalTextBloc, LocalTextState>(
+                        builder: (context, state) {
+                          if (state is LocalTextLoadingState) {
+                            return const CircularProgressIndicator();
+                          } else if (state is LocalTextSuccessState) {
+                            // Sonucu outputController'a atıyoruz
+                            wcdata.data = [];
+                            log(wcdata.data.toString());
+                            for (var element in state.wordCloudList ?? []) {
+                              wcdata.addData(
+                                  element["word"],
+                                  double.tryParse(
+                                          element["value"].toString()) ??
+                                      10);
+                            }
+                            log("second${wcdata.data}");
+
+                            wordCloudKey = UniqueKey();
+
+                            return Expanded(
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: RepaintBoundary(
+                                      key: _wordCloudKey,
+                                      child: WordCloudView(
+                                        mintextsize: 12,
+                                        maxtextsize: 120,
+                                        data: wcdata,
+                                        key: wordCloudKey,
+                                        mapwidth: context.dynamicWidth(0.9),
+                                        mapheight: context.dynamicHeight(0.4),
+                                        colorlist: const [
+                                          Colors.red,
+                                          Colors.pink,
+                                          Colors.purple,
+                                          Colors.deepPurple,
+                                          Colors.indigo,
+                                          Colors.blue,
+                                          Colors.lightBlue,
+                                          Colors.cyan,
+                                          Colors.teal,
+                                          Colors.green,
+                                          Colors.black,
+                                          Colors.lightGreen,
+                                          Colors.lime,
+                                          Colors.yellow,
+                                          Colors.amber,
+                                          Colors.orange,
+                                          Colors.deepOrange,
+                                          Colors.brown,
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: BorderedButton(
+                                          isBordered: false,
+                                          color: AppColors.kPrimaryLight,
+                                          textStyle: context
+                                              .textTheme.bodyMedium
+                                              ?.copyWith(
+                                                  color: AppColors.kWhite),
+                                          text: "${context.locale?.share}",
+                                          onPressed: () {
+                                            // Resmi Paylaş
+                                            _shareWidgetAsImage();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (state is LocalTextErrorState) {
+                            return Padding(
+                              padding: context.paddingTopDefault,
+                              child: Text(state.message ?? ""),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

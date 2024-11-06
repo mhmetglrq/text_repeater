@@ -38,9 +38,9 @@ class Onboard extends StatelessWidget {
                                 height: context.dynamicHeight(0.05),
                               ),
                               Text(
-                                "i love you 💙😍💕",
+                                "${context.locale?.iLoveYouText}",
                                 style: context.textTheme.bodySmall?.copyWith(
-                                  fontSize: context.dynamicHeight(0.02),
+                                  fontSize: context.dynamicHeight(0.015),
                                 ),
                               ),
                             ],
@@ -56,9 +56,9 @@ class Onboard extends StatelessWidget {
                               height: context.dynamicHeight(0.055),
                             ),
                             Text(
-                              "i love you 💙😍💕",
+                              "${context.locale?.iLoveYouText}",
                               style: context.textTheme.bodySmall?.copyWith(
-                                fontSize: context.dynamicHeight(0.022),
+                                fontSize: context.dynamicHeight(0.017),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -76,9 +76,9 @@ class Onboard extends StatelessWidget {
                                 height: context.dynamicHeight(0.05),
                               ),
                               Text(
-                                "i love you 💙😍💕",
+                                "${context.locale?.iLoveYouText}",
                                 style: context.textTheme.bodySmall?.copyWith(
-                                  fontSize: context.dynamicHeight(0.02),
+                                  fontSize: context.dynamicHeight(0.015),
                                 ),
                               ),
                             ],
@@ -113,7 +113,7 @@ class Onboard extends StatelessWidget {
                       Padding(
                         padding: context.paddingAllDefault,
                         child: Text(
-                          "Welcome to Text Repeater",
+                          "${context.locale?.welcomeOnboard}",
                           style: context.textTheme.displayLarge,
                           textAlign: TextAlign.center,
                         ),
@@ -121,7 +121,7 @@ class Onboard extends StatelessWidget {
                       Padding(
                         padding: context.paddingAllLow,
                         child: Text(
-                          "This app will help you to repeat your text as many times as you want.",
+                          "${context.locale?.enterDashboard}",
                           style: context.textTheme.bodySmall?.copyWith(
                             color: AppColors.kNeutral50,
                           ),
@@ -131,7 +131,7 @@ class Onboard extends StatelessWidget {
                       Padding(
                         padding: context.paddingAllLow,
                         child: BorderedButton(
-                          text: "Get Started",
+                          text: "${context.locale?.getStarted}",
                           color: AppColors.kPrimaryLight,
                           isBordered: false,
                           textStyle: context.textTheme.titleMedium?.copyWith(

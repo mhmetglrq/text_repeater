@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,226 +66,251 @@ class _TextRepeaterState extends State<TextRepeater> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: context.paddingAllDefault,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const CustomAppBar(
-                  title: 'Text Repeater',
-                ),
-                Padding(
-                  padding: context.paddingTopDefault,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.kWhite,
-                      border: ContainerBorders.containerMediumBorder,
-                      borderRadius: ContainerBorders.borderRadius,
-                    ),
-                    child: Padding(
-                      padding: context.paddingAllDefault,
-                      child: Column(
-                        children: [
-                          InputField(
-                            labelText: "Text",
-                            controller: _textController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please enter a text";
-                              }
-                              return null;
-                            },
-                          ),
-                          Padding(
-                            padding: context.paddingVerticalLow,
-                            child: InputField(
-                              labelText: "Repeat Count",
-                              controller: _repeatController,
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please enter a repeat count";
-                                } else if (value == "0") {
-                                  return "Please enter a number greater than 0";
-                                } else if (int.tryParse(value) == null) {
-                                  return "Please enter a valid number";
-                                } else if (value.length > 4) {
-                                  return "Please enter a number less than 10000";
-                                }
-
-                                return null;
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: context.paddingVerticalLow,
-                            child: CheckboxListTile.adaptive(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  "New Line",
-                                  style: context.textTheme.labelMedium,
-                                ),
-                                activeColor: AppColors.kPrimaryLight,
-                                checkboxShape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  side: const BorderSide(
-                                    color: AppColors.kPrimaryLight,
-                                  ),
-                                ),
-                                checkColor: AppColors.kWhite,
-                                value: _isNewLine,
-                                side: const BorderSide(
-                                  color: AppColors.kPrimaryLight,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isNewLine = value ?? false;
-                                  });
-                                }),
-                          ),
-                          BorderedButton(
-                            text: "Repeat",
-                            onPressed: () async {
-                              if (!_formKey.currentState!.validate()) {
-                                return;
-                              } else {
-                                context
-                                    .read<LocalTextBloc>()
-                                    .add(const IncrementAdCountEvent());
-                                BlocProvider.of<LocalTextBloc>(context).add(
-                                  RepeatTextEvent(
-                                    text: _textController.text,
-                                    newLine: _isNewLine,
-                                    times:
-                                        int.tryParse(_repeatController.text) ??
-                                            0,
-                                  ),
-                                );
-                              }
-                            },
-                            color: AppColors.kPrimaryLight,
-                            isBordered: false,
-                            textStyle: context.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.kWhite,
-                            ),
-                          ),
-                        ],
+      body: Directionality(
+        textDirection: context.locale?.localeName == "ar"
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: BlocConsumer<LocalTextBloc, LocalTextState>(
+          listener: (context, state) {
+            if (state is LocalTextSuccessState) {
+              if ((state.adCount ?? 1) % 3 == 0) {
+                AdMobHelper().showRewardedInterstitialAd(onRewarded: () {
+                  context.read<LocalTextBloc>().add(
+                        RepeatTextEvent(
+                          text: _textController.text,
+                          newLine: _isNewLine,
+                          times: int.tryParse(_repeatController.text) ?? 0,
+                        ),
+                      );
+                }, onDismissed: () {
+                  context
+                      .read<LocalTextBloc>()
+                      .add(const IncrementAdCountEvent(adCount: 3));
+                });
+              }
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Padding(
+                padding: context.paddingAllDefault,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomAppBar(
+                        title: "${context.locale?.repeatTextMenuTitle}",
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: context.dynamicHeight(0.02),
-                ),
-                BlocConsumer<LocalTextBloc, LocalTextState>(
-                  builder: (context, state) {
-                    if (state is LocalTextLoadingState) {
-                      return const CircularProgressIndicator();
-                    } else if (state is LocalTextSuccessState) {
-                      // Sonucu outputController'a atıyoruz
-                      _outputController.text = state.text ?? "";
-
-                      return Expanded(
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.kWhite,
-                                  border:
-                                      ContainerBorders.containerMediumBorder,
-                                  borderRadius: ContainerBorders.borderRadius,
-                                ),
-                                padding: context.paddingAllDefault,
-                                child: GestureDetector(
-                                  onTap:
-                                      _selectAllText, // Dokunulduğunda tüm metni seç
-                                  child: TextField(
-                                    controller: _outputController,
-                                    readOnly: true, // Metin düzenlenemez
-                                    maxLines:
-                                        null, // Metnin tamamını göstermek için
-                                    style: context.textTheme.bodyMedium,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    textAlign: TextAlign.justify,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Row(
+                      Padding(
+                        padding: context.paddingTopDefault,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.kWhite,
+                            border: ContainerBorders.containerMediumBorder,
+                            borderRadius: ContainerBorders.borderRadius,
+                          ),
+                          child: Padding(
+                            padding: context.paddingAllDefault,
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Copy",
-                                    onPressed: () {
-                                      // Metni panoya kopyala
-                                      Clipboard.setData(ClipboardData(
-                                          text: _outputController.text));
-                                      Utils.showNotification(
-                                        context,
-                                        "Copied to clipboard",
-                                        "The text has been copied to the clipboard.",
-                                        type: ToastificationType.success,
-                                      );
+                                InputField(
+                                  labelText: "${context.locale?.text}",
+                                  controller: _textController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "${context.locale?.textValid}";
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                Padding(
+                                  padding: context.paddingVerticalLow,
+                                  child: InputField(
+                                    labelText: "${context.locale?.repeatCount}",
+                                    controller: _repeatController,
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "${context.locale?.countValid}";
+                                      } else if (value == "0") {
+                                        return "${context.locale?.greatThanZero}";
+                                      } else if (int.tryParse(value) == null) {
+                                        return "${context.locale?.validNumber}";
+                                      } else if (value.length > 4) {
+                                        return "${context.locale?.lessThanTenThousand}";
+                                      }
+
+                                      return null;
                                     },
                                   ),
                                 ),
-                                SizedBox(width: context.dynamicWidth(0.02)),
-                                Expanded(
-                                  child: BorderedButton(
-                                    isBordered: false,
-                                    color: AppColors.kPrimaryLight,
-                                    textStyle: context.textTheme.bodyMedium
-                                        ?.copyWith(color: AppColors.kWhite),
-                                    text: "Share",
-                                    onPressed: () {
-                                      // Metni paylaş
-                                      Share.share(_outputController.text);
-                                    },
+                                Padding(
+                                  padding: context.paddingVerticalLow,
+                                  child: CheckboxListTile.adaptive(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                        "${context.locale?.newLine}",
+                                        style: context.textTheme.labelMedium,
+                                      ),
+                                      activeColor: AppColors.kPrimaryLight,
+                                      checkboxShape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                        side: const BorderSide(
+                                          color: AppColors.kPrimaryLight,
+                                        ),
+                                      ),
+                                      checkColor: AppColors.kWhite,
+                                      value: _isNewLine,
+                                      side: const BorderSide(
+                                        color: AppColors.kPrimaryLight,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _isNewLine = value ?? false;
+                                        });
+                                      }),
+                                ),
+                                BorderedButton(
+                                  text: "${context.locale?.repeat}",
+                                  onPressed: () async {
+                                    if (!_formKey.currentState!.validate()) {
+                                      return;
+                                    } else {
+                                      context
+                                          .read<LocalTextBloc>()
+                                          .add(const IncrementAdCountEvent());
+                                      if (((state.adCount ?? 1) + 1) % 3 != 0) {
+                                        BlocProvider.of<LocalTextBloc>(context)
+                                            .add(
+                                          RepeatTextEvent(
+                                            text: _textController.text,
+                                            newLine: _isNewLine,
+                                            times: int.tryParse(
+                                                    _repeatController.text) ??
+                                                0,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  color: AppColors.kPrimaryLight,
+                                  isBordered: false,
+                                  textStyle:
+                                      context.textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.kWhite,
                                   ),
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      );
-                    } else if (state is LocalTextErrorState) {
-                      return Padding(
-                        padding: context.paddingTopDefault,
-                        child: Text(state.message ?? ""),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
-                  listener: (BuildContext context, LocalTextState state) {
-                    if (state is LocalTextSuccessState) {
-                      if ((state.adCount ?? 1) % 3 == 0) {
-                        AdMobHelper().showRewardedInterstitialAd(
-                            onRewarded: () {
-                          context
-                              .read<LocalTextBloc>()
-                              .add(const IncrementAdCountEvent());
-                        });
-                      }
-                      log("Ad count: ${state.adCount}");
-                    }
-                  },
+                      ),
+                      SizedBox(
+                        height: context.dynamicHeight(0.02),
+                      ),
+                      BlocBuilder<LocalTextBloc, LocalTextState>(
+                        builder: (context, state) {
+                          if (state is LocalTextLoadingState) {
+                            return const CircularProgressIndicator();
+                          } else if (state is LocalTextSuccessState) {
+                            // Sonucu outputController'a atıyoruz
+                            _outputController.text = state.text ?? "";
+
+                            return Expanded(
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.kWhite,
+                                        border: ContainerBorders
+                                            .containerMediumBorder,
+                                        borderRadius:
+                                            ContainerBorders.borderRadius,
+                                      ),
+                                      padding: context.paddingAllDefault,
+                                      child: GestureDetector(
+                                        onTap:
+                                            _selectAllText, // Dokunulduğunda tüm metni seç
+                                        child: TextField(
+                                          controller: _outputController,
+                                          readOnly: true, // Metin düzenlenemez
+                                          maxLines:
+                                              null, // Metnin tamamını göstermek için
+                                          style: context.textTheme.bodyMedium,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                          ),
+                                          textAlign: TextAlign.justify,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: BorderedButton(
+                                          isBordered: false,
+                                          color: AppColors.kPrimaryLight,
+                                          textStyle: context
+                                              .textTheme.bodyMedium
+                                              ?.copyWith(
+                                                  color: AppColors.kWhite),
+                                          text: "${context.locale?.copy}",
+                                          onPressed: () {
+                                            // Metni panoya kopyala
+                                            Clipboard.setData(ClipboardData(
+                                                text: _outputController.text));
+                                            Utils.showNotification(
+                                              context,
+                                              "${context.locale?.copiedTitle}",
+                                              "${context.locale?.copiedMsg}",
+                                              type: ToastificationType.success,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          width: context.dynamicWidth(0.02)),
+                                      Expanded(
+                                        child: BorderedButton(
+                                          isBordered: false,
+                                          color: AppColors.kPrimaryLight,
+                                          textStyle: context
+                                              .textTheme.bodyMedium
+                                              ?.copyWith(
+                                                  color: AppColors.kWhite),
+                                          text: "${context.locale?.share}",
+                                          onPressed: () {
+                                            // Metni paylaş
+                                            Share.share(_outputController.text);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (state is LocalTextErrorState) {
+                            return Padding(
+                              padding: context.paddingTopDefault,
+                              child: Text(state.message ?? ""),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
