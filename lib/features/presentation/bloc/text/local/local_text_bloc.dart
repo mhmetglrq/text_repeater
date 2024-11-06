@@ -172,6 +172,14 @@ class LocalTextBloc extends Bloc<LocalTextEvent, LocalTextState> {
 
   void onIncrementAdCount(
       IncrementAdCountEvent event, Emitter<LocalTextState> emit) {
+    if (event.adCount != null) {
+      emit(LocalTextSuccessState(
+        adCount: event.adCount,
+        text: state.text,
+        savedTexts: state.savedTexts,
+      ));
+      return;
+    }
     int adCount = state.adCount ?? 0;
     adCount++;
 

@@ -3,7 +3,7 @@ part of 'local_text_bloc.dart';
 sealed class LocalTextEvent extends Equatable {
   final String? text;
   final bool? isRecent;
-  const LocalTextEvent({ this.text, this.isRecent});
+  const LocalTextEvent({this.text, this.isRecent});
 
   @override
   List<Object?> get props => [text, isRecent];
@@ -68,5 +68,6 @@ class RemoveTextEvent extends LocalTextEvent {
 }
 
 class IncrementAdCountEvent extends LocalTextEvent {
-  const IncrementAdCountEvent();
+  final int? adCount;
+  const IncrementAdCountEvent({this.adCount});
 }
