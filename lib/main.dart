@@ -9,7 +9,8 @@ import 'features/presentation/bloc/text/local/local_text_bloc.dart';
 import 'my_app.dart';
 
 ///TODO Add increment event to features
-///TODO as a reward of the ad should be feature
+///TODO as a reward of the ad should be features
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDependencies();
